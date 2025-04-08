@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Filter, PlusCircle, Check } from 'lucide-react';
@@ -6,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import EquipmentCard, { Equipment } from '@/components/EquipmentCard';
 import { nanoid } from 'nanoid';
+import { Tag } from 'lucide-react';
 
 const categories = [
   "All Categories",
