@@ -4,6 +4,15 @@ import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { Produce } from './ProduceCard';
 
+const categories = [
+  "Fruits",
+  "Vegetables", 
+  "Grains",
+  "Dairy",
+  "Nuts",
+  "Other"
+];
+
 interface InventoryFormProps {
   onAddProduce: (produce: Omit<Produce, 'id'>) => void;
 }
@@ -16,12 +25,13 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
   const [expiryDate, setExpiryDate] = useState('');
   const [farmName, setFarmName] = useState('');
   const [location, setLocation] = useState('');
+  const [category, setCategory] = useState('');
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name || !quantity || !harvestDate || !expiryDate || !farmName || !location) {
+    if (!name || !quantity || !harvestDate || !expiryDate || !farmName || !location || !category) {
       toast({
         title: 'Missing Information',
         description: 'Please fill in all fields',
@@ -38,7 +48,8 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
       harvestDate: new Date(harvestDate),
       expiryDate: new Date(expiryDate),
       farmName,
-      location
+      location,
+      category
     };
 
     onAddProduce(newProduce);
@@ -49,6 +60,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
     setUnit('kg');
     setHarvestDate('');
     setExpiryDate('');
+    setCategory('');
     
     toast({
       title: 'Success',
@@ -105,6 +117,21 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
           </div>
           
           <div>
+            <label className="block text-sm font-medium mb-1">Category</label>
+            <select
+              className="form-input"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              required
+            >
+              <option value="">Select Category</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div>
             <label className="block text-sm font-medium mb-1">Harvest Date</label>
             <input
               type="date"
@@ -145,7 +172,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
               className="form-input"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              placeholder="e.g., Portland, OR"
+              placeholder="e.g., Mumbai, Maharashtra"
               required
             />
           </div>

@@ -15,9 +15,16 @@ export interface Equipment {
 
 interface EquipmentCardProps {
   equipment: Equipment;
+  onBorrow?: (id: string) => void;
 }
 
-const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment }) => {
+const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment, onBorrow }) => {
+  const handleBorrowClick = () => {
+    if (equipment.available && onBorrow) {
+      onBorrow(equipment.id);
+    }
+  };
+
   return (
     <div className="equipment-card bg-white rounded-lg shadow overflow-hidden border border-gray-100">
       <div className="h-48 overflow-hidden relative">
@@ -67,6 +74,7 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment }) => {
                 ? 'bg-farmlink-primary text-white hover:bg-farmlink-primary/90' 
                 : 'bg-gray-100 text-gray-500 cursor-not-allowed'
             }`}
+            onClick={handleBorrowClick}
             disabled={!equipment.available}
           >
             {equipment.available ? 'Request to Borrow' : 'Currently Unavailable'}

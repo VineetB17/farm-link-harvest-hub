@@ -35,7 +35,7 @@ const Marketplace: React.FC = () => {
           harvestDate: new Date('2025-04-01'),
           expiryDate: new Date('2025-04-20'),
           farmName: 'Sunny Hill Orchards',
-          location: 'Eugene, OR',
+          location: 'Shimla, Himachal Pradesh',
           category: 'Fruits'
         },
         {
@@ -47,7 +47,7 @@ const Marketplace: React.FC = () => {
           harvestDate: new Date('2025-04-03'),
           expiryDate: new Date('2025-04-15'),
           farmName: 'Golden Fields Farm',
-          location: 'Salem, OR',
+          location: 'Chandigarh, Punjab',
           category: 'Vegetables'
         },
         {
@@ -59,7 +59,7 @@ const Marketplace: React.FC = () => {
           harvestDate: new Date('2025-04-02'),
           expiryDate: new Date('2025-04-10'),
           farmName: 'River Valley Greens',
-          location: 'Corvallis, OR',
+          location: 'Ooty, Tamil Nadu',
           category: 'Vegetables'
         },
         {
@@ -71,7 +71,7 @@ const Marketplace: React.FC = () => {
           harvestDate: new Date('2025-03-30'),
           expiryDate: new Date('2025-04-30'),
           farmName: 'Mountain View Farm',
-          location: 'Bend, OR',
+          location: 'Agra, Uttar Pradesh',
           category: 'Vegetables'
         },
         {
@@ -83,7 +83,7 @@ const Marketplace: React.FC = () => {
           harvestDate: new Date('2025-04-05'),
           expiryDate: new Date('2025-04-18'),
           farmName: 'Rainbow Gardens',
-          location: 'Medford, OR',
+          location: 'Nashik, Maharashtra',
           category: 'Vegetables'
         },
         {
@@ -95,7 +95,7 @@ const Marketplace: React.FC = () => {
           harvestDate: new Date('2025-04-04'),
           expiryDate: new Date('2025-04-09'),
           farmName: 'Berry Best Farm',
-          location: 'Portland, OR',
+          location: 'Mahabaleshwar, Maharashtra',
           category: 'Fruits'
         },
         {
@@ -107,7 +107,7 @@ const Marketplace: React.FC = () => {
           harvestDate: new Date('2025-04-06'),
           expiryDate: new Date('2025-04-12'),
           farmName: 'Happy Cow Dairy',
-          location: 'Eugene, OR',
+          location: 'Anand, Gujarat',
           category: 'Dairy'
         },
         {
@@ -119,9 +119,57 @@ const Marketplace: React.FC = () => {
           harvestDate: new Date('2025-03-25'),
           expiryDate: new Date('2025-06-25'),
           farmName: 'Nutty Farm',
-          location: 'Medford, OR',
+          location: 'Pune, Maharashtra',
           category: 'Nuts'
         },
+        {
+          id: '109',
+          name: 'Basmati Rice',
+          quantity: 200,
+          unit: 'kg',
+          imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c',
+          harvestDate: new Date('2025-03-15'),
+          expiryDate: new Date('2025-07-15'),
+          farmName: 'Ganges Valley Farm',
+          location: 'Dehradun, Uttarakhand',
+          category: 'Grains'
+        },
+        {
+          id: '110',
+          name: 'Mangoes',
+          quantity: 60,
+          unit: 'kg',
+          imageUrl: 'https://images.unsplash.com/photo-1501746877-14782df58970',
+          harvestDate: new Date('2025-04-10'),
+          expiryDate: new Date('2025-04-25'),
+          farmName: 'Tropical Paradise',
+          location: 'Ratnagiri, Maharashtra',
+          category: 'Fruits'
+        },
+        {
+          id: '111',
+          name: 'Coconut',
+          quantity: 80,
+          unit: 'pieces',
+          imageUrl: 'https://images.unsplash.com/photo-1581375321224-79da6fd32f6e',
+          harvestDate: new Date('2025-04-08'),
+          expiryDate: new Date('2025-05-20'),
+          farmName: 'Coastal Growers',
+          location: 'Kochi, Kerala',
+          category: 'Nuts'
+        },
+        {
+          id: '112',
+          name: 'Paneer',
+          quantity: 25,
+          unit: 'kg',
+          imageUrl: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7',
+          harvestDate: new Date('2025-04-07'),
+          expiryDate: new Date('2025-04-15'),
+          farmName: 'Pure Dairy',
+          location: 'Karnal, Haryana',
+          category: 'Dairy'
+        }
       ];
       
       setMarketItems(sampleData);

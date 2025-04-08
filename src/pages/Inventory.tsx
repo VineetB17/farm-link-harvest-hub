@@ -28,7 +28,7 @@ const Inventory: React.FC = () => {
       harvestDate: new Date('2025-04-01'),
       expiryDate: new Date('2025-04-15'),
       farmName: 'Green Valley Farm',
-      location: 'Portland, OR',
+      location: 'Mumbai, Maharashtra',
       category: 'Vegetables'
     },
     {
@@ -40,7 +40,7 @@ const Inventory: React.FC = () => {
       harvestDate: new Date('2025-04-02'),
       expiryDate: new Date('2025-04-08'),
       farmName: 'Green Valley Farm',
-      location: 'Portland, OR',
+      location: 'Delhi, Delhi',
       category: 'Vegetables'
     },
     {
@@ -52,7 +52,7 @@ const Inventory: React.FC = () => {
       harvestDate: new Date('2025-04-01'),
       expiryDate: new Date('2025-04-30'),
       farmName: 'Green Valley Farm',
-      location: 'Portland, OR',
+      location: 'Bangalore, Karnataka',
       category: 'Vegetables'
     },
     {
@@ -64,7 +64,7 @@ const Inventory: React.FC = () => {
       harvestDate: new Date('2025-04-01'),
       expiryDate: new Date('2025-04-25'),
       farmName: 'Green Valley Farm',
-      location: 'Portland, OR',
+      location: 'Shimla, Himachal Pradesh',
       category: 'Fruits'
     },
     {
@@ -76,7 +76,7 @@ const Inventory: React.FC = () => {
       harvestDate: new Date('2025-03-25'),
       expiryDate: new Date('2025-06-25'),
       farmName: 'Green Valley Farm',
-      location: 'Portland, OR',
+      location: 'Ludhiana, Punjab',
       category: 'Grains'
     }
   ]);

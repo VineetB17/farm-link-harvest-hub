@@ -19,13 +19,13 @@ const Footer: React.FC = () => {
               <li><Link to="/" className="text-sm opacity-80 hover:opacity-100">Home</Link></li>
               <li><Link to="/marketplace" className="text-sm opacity-80 hover:opacity-100">Marketplace</Link></li>
               <li><Link to="/weather" className="text-sm opacity-80 hover:opacity-100">Weather</Link></li>
-              <li><Link to="/about" className="text-sm opacity-80 hover:opacity-100">About Us</Link></li>
+              <li><Link to="/lending" className="text-sm opacity-80 hover:opacity-100">Equipment Lending</Link></li>
             </ul>
           </div>
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact</h3>
-            <p className="text-sm opacity-80">Email: info@farmlink.com</p>
-            <p className="text-sm opacity-80">Phone: (123) 456-7890</p>
+            <p className="text-sm opacity-80">Email: ritesh77@gmail.com</p>
+            <p className="text-sm opacity-80">Phone: +91 7303231776</p>
           </div>
         </div>
         <div className="border-t border-white/20 mt-8 pt-4 text-sm opacity-70 text-center">
