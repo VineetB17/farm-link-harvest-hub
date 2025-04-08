@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, User, LogOut, Tool } from 'lucide-react';
+import { Menu, X, User, LogOut, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 
