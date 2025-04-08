@@ -3,9 +3,20 @@ import React, { useEffect, useState } from 'react';
 import ProduceCard, { Produce } from '@/components/ProduceCard';
 import { Search, Filter } from 'lucide-react';
 
+const categories = [
+  "All Categories",
+  "Fruits",
+  "Vegetables", 
+  "Grains",
+  "Dairy",
+  "Nuts",
+  "Other"
+];
+
 const Marketplace: React.FC = () => {
   const [marketItems, setMarketItems] = useState<Produce[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,7 +35,8 @@ const Marketplace: React.FC = () => {
           harvestDate: new Date('2025-04-01'),
           expiryDate: new Date('2025-04-20'),
           farmName: 'Sunny Hill Orchards',
-          location: 'Eugene, OR'
+          location: 'Eugene, OR',
+          category: 'Fruits'
         },
         {
           id: '102',
@@ -35,7 +47,8 @@ const Marketplace: React.FC = () => {
           harvestDate: new Date('2025-04-03'),
           expiryDate: new Date('2025-04-15'),
           farmName: 'Golden Fields Farm',
-          location: 'Salem, OR'
+          location: 'Salem, OR',
+          category: 'Vegetables'
         },
         {
           id: '103',
@@ -46,7 +59,8 @@ const Marketplace: React.FC = () => {
           harvestDate: new Date('2025-04-02'),
           expiryDate: new Date('2025-04-10'),
           farmName: 'River Valley Greens',
-          location: 'Corvallis, OR'
+          location: 'Corvallis, OR',
+          category: 'Vegetables'
         },
         {
           id: '104',
@@ -57,7 +71,8 @@ const Marketplace: React.FC = () => {
           harvestDate: new Date('2025-03-30'),
           expiryDate: new Date('2025-04-30'),
           farmName: 'Mountain View Farm',
-          location: 'Bend, OR'
+          location: 'Bend, OR',
+          category: 'Vegetables'
         },
         {
           id: '105',
@@ -68,7 +83,8 @@ const Marketplace: React.FC = () => {
           harvestDate: new Date('2025-04-05'),
           expiryDate: new Date('2025-04-18'),
           farmName: 'Rainbow Gardens',
-          location: 'Medford, OR'
+          location: 'Medford, OR',
+          category: 'Vegetables'
         },
         {
           id: '106',
@@ -79,7 +95,32 @@ const Marketplace: React.FC = () => {
           harvestDate: new Date('2025-04-04'),
           expiryDate: new Date('2025-04-09'),
           farmName: 'Berry Best Farm',
-          location: 'Portland, OR'
+          location: 'Portland, OR',
+          category: 'Fruits'
+        },
+        {
+          id: '107',
+          name: 'Organic Milk',
+          quantity: 20,
+          unit: 'liters',
+          imageUrl: 'https://images.unsplash.com/photo-1563636619-e9143da7973b',
+          harvestDate: new Date('2025-04-06'),
+          expiryDate: new Date('2025-04-12'),
+          farmName: 'Happy Cow Dairy',
+          location: 'Eugene, OR',
+          category: 'Dairy'
+        },
+        {
+          id: '108',
+          name: 'Almonds',
+          quantity: 35,
+          unit: 'kg',
+          imageUrl: 'https://images.unsplash.com/photo-1508061538535-6effdf9eb6f5',
+          harvestDate: new Date('2025-03-25'),
+          expiryDate: new Date('2025-06-25'),
+          farmName: 'Nutty Farm',
+          location: 'Medford, OR',
+          category: 'Nuts'
         },
       ];
       
@@ -90,11 +131,15 @@ const Marketplace: React.FC = () => {
     loadSampleData();
   }, []);
 
-  const filteredItems = marketItems.filter(item => 
-    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.farmName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.location.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredItems = marketItems.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         item.farmName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         item.location.toLowerCase().includes(searchTerm.toLowerCase());
+                         
+    const matchesCategory = selectedCategory === 'All Categories' || item.category === selectedCategory;
+    
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <div className="farmlink-container py-10">
@@ -107,18 +152,27 @@ const Marketplace: React.FC = () => {
           </div>
           <input
             type="text"
-            className="form-input pl-10"
+            className="form-input pl-10 w-full"
             placeholder="Search by produce, farm name or location..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         
-        <div className="flex justify-end mt-4">
-          <button className="flex items-center text-sm text-gray-600 hover:text-farmlink-primary">
-            <Filter size={16} className="mr-1" />
-            Filter options
-          </button>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`px-3 py-1 text-sm rounded-full ${
+                selectedCategory === category 
+                  ? 'bg-farmlink-primary text-white' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {category}
+            </button>
+          ))}
         </div>
       </div>
 

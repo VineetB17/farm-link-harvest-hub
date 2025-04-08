@@ -14,6 +14,8 @@ import Inventory from "./pages/Inventory";
 import Marketplace from "./pages/Marketplace";
 import Weather from "./pages/Weather";
 import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
+import Lending from "./pages/Lending";
 
 // Components
 import Navbar from "./components/Navbar";
@@ -69,6 +71,18 @@ const AppContent = () => {
         <Route path="/weather" element={
           <ProtectedRoute>
             <Weather />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/lending" element={
+          <ProtectedRoute>
+            <Lending />
           </ProtectedRoute>
         } />
         

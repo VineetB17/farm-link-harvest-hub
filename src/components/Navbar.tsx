@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, User, LogOut } from 'lucide-react';
+import { Menu, X, User, LogOut, Tool } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -45,7 +45,9 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onLogout }) => {
                     {isLoggedIn ? (
                       <>
                         <Link to="/inventory" className="text-gray-700 hover:text-farmlink-primary" onClick={toggleMenu}>My Inventory</Link>
+                        <Link to="/lending" className="text-gray-700 hover:text-farmlink-primary" onClick={toggleMenu}>Equipment Lending</Link>
                         <Link to="/weather" className="text-gray-700 hover:text-farmlink-primary" onClick={toggleMenu}>Weather</Link>
+                        <Link to="/profile" className="text-gray-700 hover:text-farmlink-primary" onClick={toggleMenu}>My Profile</Link>
                         <button 
                           onClick={() => {
                             onLogout();
@@ -75,6 +77,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onLogout }) => {
                 {isLoggedIn && (
                   <>
                     <Link to="/inventory" className="text-gray-700 hover:text-farmlink-primary">My Inventory</Link>
+                    <Link to="/lending" className="text-gray-700 hover:text-farmlink-primary">Equipment Lending</Link>
                     <Link to="/weather" className="text-gray-700 hover:text-farmlink-primary">Weather</Link>
                   </>
                 )}

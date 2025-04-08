@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Calendar } from 'lucide-react';
+import { Calendar, Tag } from 'lucide-react';
 import { formatDistance } from 'date-fns';
 
 export interface Produce {
@@ -13,6 +13,7 @@ export interface Produce {
   expiryDate: Date;
   farmName: string;
   location: string;
+  category?: string;
 }
 
 interface ProduceCardProps {
@@ -25,7 +26,7 @@ const ProduceCard: React.FC<ProduceCardProps> = ({ produce }) => {
   const isExpiringSoon = new Date(produce.expiryDate).getTime() - now.getTime() < 3 * 24 * 60 * 60 * 1000;
   
   return (
-    <div className="produce-card">
+    <div className="produce-card bg-white rounded-lg shadow overflow-hidden border border-gray-100">
       <div className="h-48 overflow-hidden">
         <img 
           src={produce.imageUrl || '/placeholder.svg'} 
@@ -37,6 +38,13 @@ const ProduceCard: React.FC<ProduceCardProps> = ({ produce }) => {
         />
       </div>
       <div className="p-4">
+        {produce.category && (
+          <div className="flex items-center mb-2">
+            <Tag size={16} className="text-farmlink-accent mr-2" />
+            <span className="text-sm text-farmlink-accent">{produce.category}</span>
+          </div>
+        )}
+        
         <div className="flex justify-between items-center mb-2">
           <h3 className="font-semibold text-lg">{produce.name}</h3>
           <span className="text-farmlink-primary font-semibold">

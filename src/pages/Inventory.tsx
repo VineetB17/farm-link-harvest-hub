@@ -2,11 +2,22 @@
 import React, { useState } from 'react';
 import ProduceCard, { Produce } from '@/components/ProduceCard';
 import InventoryForm from '@/components/InventoryForm';
-import { Plus, Minus } from 'lucide-react';
+import { Plus, Minus, Filter } from 'lucide-react';
 import { nanoid } from 'nanoid';
+
+const categories = [
+  "All Categories",
+  "Fruits",
+  "Vegetables", 
+  "Grains",
+  "Dairy",
+  "Nuts",
+  "Other"
+];
 
 const Inventory: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [inventory, setInventory] = useState<Produce[]>([
     {
       id: '1',
@@ -17,7 +28,8 @@ const Inventory: React.FC = () => {
       harvestDate: new Date('2025-04-01'),
       expiryDate: new Date('2025-04-15'),
       farmName: 'Green Valley Farm',
-      location: 'Portland, OR'
+      location: 'Portland, OR',
+      category: 'Vegetables'
     },
     {
       id: '2',
@@ -28,7 +40,8 @@ const Inventory: React.FC = () => {
       harvestDate: new Date('2025-04-02'),
       expiryDate: new Date('2025-04-08'),
       farmName: 'Green Valley Farm',
-      location: 'Portland, OR'
+      location: 'Portland, OR',
+      category: 'Vegetables'
     },
     {
       id: '3',
@@ -39,7 +52,32 @@ const Inventory: React.FC = () => {
       harvestDate: new Date('2025-04-01'),
       expiryDate: new Date('2025-04-30'),
       farmName: 'Green Valley Farm',
-      location: 'Portland, OR'
+      location: 'Portland, OR',
+      category: 'Vegetables'
+    },
+    {
+      id: '4',
+      name: 'Apples',
+      quantity: 40,
+      unit: 'kg',
+      imageUrl: 'https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a',
+      harvestDate: new Date('2025-04-01'),
+      expiryDate: new Date('2025-04-25'),
+      farmName: 'Green Valley Farm',
+      location: 'Portland, OR',
+      category: 'Fruits'
+    },
+    {
+      id: '5',
+      name: 'Wheat',
+      quantity: 100,
+      unit: 'kg',
+      imageUrl: 'https://images.unsplash.com/photo-1574323347407-f5e1bdbd3b8f',
+      harvestDate: new Date('2025-03-25'),
+      expiryDate: new Date('2025-06-25'),
+      farmName: 'Green Valley Farm',
+      location: 'Portland, OR',
+      category: 'Grains'
     }
   ]);
 
@@ -52,6 +90,10 @@ const Inventory: React.FC = () => {
     setInventory([newProduce, ...inventory]);
     setShowForm(false);
   };
+
+  const filteredInventory = inventory.filter(item => 
+    selectedCategory === 'All Categories' || item.category === selectedCategory
+  );
 
   return (
     <div className="farmlink-container py-10">
@@ -81,13 +123,35 @@ const Inventory: React.FC = () => {
         </div>
       )}
 
+      <div className="mb-6">
+        <div className="flex items-center mb-4">
+          <Filter size={18} className="text-farmlink-primary mr-2" />
+          <span className="text-gray-700">Filter by Category:</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`px-3 py-1 text-sm rounded-full ${
+                selectedCategory === category 
+                  ? 'bg-farmlink-primary text-white' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {inventory.map((produce) => (
+        {filteredInventory.map((produce) => (
           <ProduceCard key={produce.id} produce={produce} />
         ))}
       </div>
 
-      {inventory.length === 0 && !showForm && (
+      {filteredInventory.length === 0 && !showForm && (
         <div className="text-center py-16 border border-dashed border-gray-300 rounded-lg">
           <p className="text-gray-500 mb-4">You don't have any produce in your inventory yet.</p>
           <button 
