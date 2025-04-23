@@ -1,11 +1,11 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { User, MapPin, Mail, Phone, Tractor, Calendar, Settings, Building2, Users2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from '@/components/ui/use-toast';
 import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { User, MapPin, Mail, Phone, Building2 } from 'lucide-react';
 
 const Profile: React.FC = () => {
   const { user } = useAuth();
@@ -17,36 +17,22 @@ const Profile: React.FC = () => {
     location: user?.location || '',
     phone: user?.phone || '',
     email: user?.email || '',
-    farmType: user?.farmType || 'Crop Farm',
-    farmSize: user?.farmSize || '',
-    employeeCount: user?.employeeCount || '',
-    mainCrops: user?.mainCrops || '',
-    certifications: user?.certifications || '',
-    yearEstablished: user?.yearEstablished || '',
     website: user?.website || '',
-    bioDescription: user?.bioDescription || ''
   });
   
   const lendingItems = [
-    { id: '1', name: 'Tractor', category: 'Equipment', borrower: 'Sharma Farms', dueDate: '2025-05-01', condition: 'Excellent' },
-    { id: '2', name: 'Irrigation System', category: 'Equipment', borrower: 'Singh Orchards', dueDate: '2025-04-20', condition: 'Good' },
-    { id: '3', name: 'Seed Drill', category: 'Tools', borrower: 'Kerala Agro', dueDate: '2025-04-25', condition: 'Fair' },
+    { id: '1', name: 'Tractor', category: 'Equipment', borrower: 'Green Valley Farms', dueDate: '2025-05-01', condition: 'Excellent' },
+    { id: '2', name: 'Irrigation System', category: 'Equipment', borrower: 'Mountain View Farm', dueDate: '2025-04-20', condition: 'Good' },
+    { id: '3', name: 'Seed Drill', category: 'Tools', borrower: 'Sunrise Agriculture', dueDate: '2025-04-25', condition: 'Fair' },
   ];
   
   const borrowingItems = [
-    { id: '1', name: 'Harvester', category: 'Equipment', lender: 'Patel Farms', dueDate: '2025-04-15', lentSince: '2025-03-15' },
-    { id: '2', name: 'Seed Spreader', category: 'Tools', lender: 'Tamil Greens', dueDate: '2025-04-25', lentSince: '2025-03-25' },
-    { id: '3', name: 'Sprinkler System', category: 'Irrigation', lender: 'Kumar Agriculture', dueDate: '2025-05-05', lentSince: '2025-04-05' },
-  ];
-  
-  const cropHistory = [
-    { id: '1', crop: 'Rice', season: 'Kharif 2024', area: '5 acres', yield: '20 quintals/acre', notes: 'Good harvest despite erratic rainfall' },
-    { id: '2', crop: 'Wheat', season: 'Rabi 2023-24', area: '7 acres', yield: '18 quintals/acre', notes: 'Used new drought-resistant variety' },
-    { id: '3', crop: 'Cotton', season: 'Kharif 2023', area: '4 acres', yield: '8 quintals/acre', notes: 'Pest attack reduced overall yield' },
-    { id: '4', crop: 'Pulses', season: 'Rabi 2022-23', area: '3 acres', yield: '10 quintals/acre', notes: 'Good quality product, sold above MSP' }
+    { id: '1', name: 'Harvester', category: 'Equipment', lender: 'Valley Farm Co.', dueDate: '2025-04-15', lentSince: '2025-03-15' },
+    { id: '2', name: 'Seed Spreader', category: 'Tools', lender: 'Green Fields Ltd', dueDate: '2025-04-25', lentSince: '2025-03-25' },
+    { id: '3', name: 'Sprinkler System', category: 'Irrigation', lender: 'Farm Tech Solutions', dueDate: '2025-05-05', lentSince: '2025-04-05' },
   ];
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -64,7 +50,7 @@ const Profile: React.FC = () => {
 
   return (
     <div className="farmlink-container py-10">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6 mb-8 pb-6 border-b">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6 mb-8">
         <div className="flex items-center">
           <div className="bg-farmlink-primary w-16 h-16 rounded-full flex items-center justify-center">
             <User className="text-white" size={28} />
@@ -79,88 +65,45 @@ const Profile: React.FC = () => {
           onClick={() => setIsEditing(!isEditing)}
           className="flex items-center px-4 py-2 bg-farmlink-primary text-white rounded-md hover:bg-farmlink-secondary transition-colors"
         >
-          <Settings size={18} className="mr-2" />
-          {isEditing ? 'Cancel Editing' : 'Edit Profile'}
+          {isEditing ? 'Save Changes' : 'Edit Profile'}
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card className="md:col-span-2">
+        <Card className="md:col-span-3">
           <CardHeader>
-            <CardTitle className="text-xl font-semibold">Farm Details</CardTitle>
+            <CardTitle className="text-xl font-semibold">Profile Details</CardTitle>
           </CardHeader>
           <CardContent>
             {isEditing ? (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Full Name</label>
-                    <Input name="name" value={formData.name} onChange={handleInputChange} />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Farm Name</label>
-                    <Input name="farmName" value={formData.farmName} onChange={handleInputChange} />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Location</label>
-                    <Input name="location" value={formData.location} onChange={handleInputChange} />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Phone</label>
-                    <Input name="phone" value={formData.phone} onChange={handleInputChange} />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Email</label>
-                    <Input name="email" value={formData.email} onChange={handleInputChange} />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Farm Type</label>
-                    <Input name="farmType" value={formData.farmType} onChange={handleInputChange} />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Farm Size</label>
-                    <Input name="farmSize" value={formData.farmSize} onChange={handleInputChange} placeholder="e.g., 50 acres" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Number of Employees</label>
-                    <Input name="employeeCount" value={formData.employeeCount} onChange={handleInputChange} />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Main Crops/Products</label>
-                    <Input name="mainCrops" value={formData.mainCrops} onChange={handleInputChange} />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Certifications</label>
-                    <Input name="certifications" value={formData.certifications} onChange={handleInputChange} placeholder="e.g., Organic, Fair Trade" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Year Established</label>
-                    <Input name="yearEstablished" value={formData.yearEstablished} onChange={handleInputChange} />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Website</label>
-                    <Input name="website" value={formData.website} onChange={handleInputChange} />
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Full Name</label>
+                  <Input name="name" value={formData.name} onChange={handleInputChange} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Farm Description</label>
-                  <textarea
-                    name="bioDescription"
-                    value={formData.bioDescription}
-                    onChange={handleInputChange}
-                    className="w-full h-24 p-2 border rounded-md"
-                    placeholder="Tell us about your farm..."
-                  />
+                  <label className="block text-sm font-medium mb-1">Farm Name</label>
+                  <Input name="farmName" value={formData.farmName} onChange={handleInputChange} />
                 </div>
-                <button 
-                  onClick={handleSaveProfile}
-                  className="px-4 py-2 bg-farmlink-primary text-white rounded-md hover:bg-farmlink-secondary transition-colors"
-                >
-                  Save Changes
-                </button>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Location</label>
+                  <Input name="location" value={formData.location} onChange={handleInputChange} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Phone</label>
+                  <Input name="phone" value={formData.phone} onChange={handleInputChange} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Email</label>
+                  <Input name="email" value={formData.email} onChange={handleInputChange} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Website</label>
+                  <Input name="website" value={formData.website} onChange={handleInputChange} />
+                </div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex items-start">
                   <User size={20} className="text-farmlink-primary mt-1 mr-3" />
                   <div>
@@ -170,18 +113,10 @@ const Profile: React.FC = () => {
                 </div>
                 
                 <div className="flex items-start">
-                  <Tractor size={20} className="text-farmlink-primary mt-1 mr-3" />
+                  <Building2 size={20} className="text-farmlink-primary mt-1 mr-3" />
                   <div>
                     <h3 className="font-medium text-gray-700">Farm Name</h3>
                     <p>{formData.farmName}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <Building2 size={20} className="text-farmlink-primary mt-1 mr-3" />
-                  <div>
-                    <h3 className="font-medium text-gray-700">Farm Type</h3>
-                    <p>{formData.farmType}</p>
                   </div>
                 </div>
                 
@@ -208,164 +143,80 @@ const Profile: React.FC = () => {
                     <p>{formData.phone}</p>
                   </div>
                 </div>
-                
-                <div className="flex items-start">
-                  <Users2 size={20} className="text-farmlink-primary mt-1 mr-3" />
-                  <div>
-                    <h3 className="font-medium text-gray-700">Employees</h3>
-                    <p>{formData.employeeCount}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <Calendar size={20} className="text-farmlink-primary mt-1 mr-3" />
-                  <div>
-                    <h3 className="font-medium text-gray-700">Established</h3>
-                    <p>{formData.yearEstablished}</p>
-                  </div>
-                </div>
               </div>
             )}
           </CardContent>
         </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold">Farm Statistics</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-gray-600">Total Land Area</p>
-                <p className="text-2xl font-bold">15 Acres</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Current Crops</p>
-                <p className="text-2xl font-bold">3 varieties</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Equipment Owned</p>
-                <p className="text-2xl font-bold">7 items</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Marketplace Rating</p>
-                <div className="flex items-center">
-                  <p className="text-2xl font-bold mr-1">4.8</p>
-                  <div className="text-yellow-500 text-xl">★★★★★</div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
-      <div className="mt-10">
-        <Tabs defaultValue="lending">
-          <TabsList className="mb-4">
-            <TabsTrigger value="lending">Items I'm Lending</TabsTrigger>
-            <TabsTrigger value="borrowing">Items I'm Borrowing</TabsTrigger>
-            <TabsTrigger value="history">Crop History</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="lending">
-            <Card>
-              <CardContent className="pt-6">
-                {lendingItems.length > 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Item Name</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Borrowed By</TableHead>
-                        <TableHead>Due Date</TableHead>
-                        <TableHead>Condition</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {lendingItems.map((item) => (
-                        <TableRow key={item.id}>
-                          <TableCell className="font-medium">{item.name}</TableCell>
-                          <TableCell>{item.category}</TableCell>
-                          <TableCell>{item.borrower}</TableCell>
-                          <TableCell>{item.dueDate}</TableCell>
-                          <TableCell>{item.condition}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <div className="text-center p-8">
-                    <p className="text-gray-500">You aren't lending any items currently.</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="borrowing">
-            <Card>
-              <CardContent className="pt-6">
-                {borrowingItems.length > 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Item Name</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Borrowed From</TableHead>
-                        <TableHead>Since</TableHead>
-                        <TableHead>Due Date</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {borrowingItems.map((item) => (
-                        <TableRow key={item.id}>
-                          <TableCell className="font-medium">{item.name}</TableCell>
-                          <TableCell>{item.category}</TableCell>
-                          <TableCell>{item.lender}</TableCell>
-                          <TableCell>{item.lentSince}</TableCell>
-                          <TableCell>{item.dueDate}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <div className="text-center p-8">
-                    <p className="text-gray-500">You aren't borrowing any items currently.</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="history">
-            <Card>
-              <CardContent className="pt-6">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Crop</TableHead>
-                      <TableHead>Season</TableHead>
-                      <TableHead>Area</TableHead>
-                      <TableHead>Yield</TableHead>
-                      <TableHead>Notes</TableHead>
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">Equipment I'm Lending</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {lendingItems.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Equipment</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Borrowed By</TableHead>
+                    <TableHead>Due Date</TableHead>
+                    <TableHead>Condition</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {lendingItems.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{item.name}</TableCell>
+                      <TableCell>{item.category}</TableCell>
+                      <TableCell>{item.borrower}</TableCell>
+                      <TableCell>{item.dueDate}</TableCell>
+                      <TableCell>{item.condition}</TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {cropHistory.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="font-medium">{item.crop}</TableCell>
-                        <TableCell>{item.season}</TableCell>
-                        <TableCell>{item.area}</TableCell>
-                        <TableCell>{item.yield}</TableCell>
-                        <TableCell className="max-w-xs truncate">{item.notes}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <p className="text-gray-500 text-center py-4">You aren't lending any equipment currently.</p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">Equipment I'm Borrowing</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {borrowingItems.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Equipment</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Lender</TableHead>
+                    <TableHead>Since</TableHead>
+                    <TableHead>Due Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {borrowingItems.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{item.name}</TableCell>
+                      <TableCell>{item.category}</TableCell>
+                      <TableCell>{item.lender}</TableCell>
+                      <TableCell>{item.lentSince}</TableCell>
+                      <TableCell>{item.dueDate}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <p className="text-gray-500 text-center py-4">You aren't borrowing any equipment currently.</p>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
