@@ -36,7 +36,6 @@ const Lending: React.FC = () => {
           id: '101',
           name: 'John Deere Tractor',
           category: 'Tractors',
-          imageUrl: 'https://images.unsplash.com/photo-1530267981375-f0de937f5f13',
           owner: 'Singh Farms',
           location: 'Amritsar, Punjab',
           available: true,
@@ -46,7 +45,6 @@ const Lending: React.FC = () => {
           id: '102',
           name: 'Irrigation System',
           category: 'Irrigation',
-          imageUrl: 'https://images.unsplash.com/photo-1594394224789-9e583e6121e5',
           owner: 'Green Valley Farms',
           location: 'Coimbatore, Tamil Nadu',
           available: true,
@@ -56,7 +54,6 @@ const Lending: React.FC = () => {
           id: '103',
           name: 'Harvest Combine',
           category: 'Harvesters',
-          imageUrl: 'https://images.unsplash.com/photo-1505672678657-cc7037095e60',
           owner: 'Kumar Agro',
           location: 'Lucknow, Uttar Pradesh',
           available: false,
@@ -66,7 +63,6 @@ const Lending: React.FC = () => {
           id: '104',
           name: 'Seedling Planter',
           category: 'Seeders',
-          imageUrl: 'https://images.unsplash.com/photo-1585153636167-3f5fa5123257',
           owner: 'Patel Organics',
           location: 'Ahmedabad, Gujarat',
           available: true,
@@ -76,7 +72,6 @@ const Lending: React.FC = () => {
           id: '105',
           name: 'Apple Sorting Machine',
           category: 'Processing',
-          imageUrl: 'https://images.unsplash.com/photo-1584691267914-91c0bee55964',
           owner: 'Himachal Growers',
           location: 'Shimla, Himachal Pradesh',
           available: true,
@@ -86,7 +81,6 @@ const Lending: React.FC = () => {
           id: '106',
           name: 'Hand Tools Bundle',
           category: 'Tools',
-          imageUrl: 'https://images.unsplash.com/photo-1534190239940-9ba8944ea261',
           owner: 'Kerala Farms',
           location: 'Trivandrum, Kerala',
           available: true,
@@ -96,7 +90,6 @@ const Lending: React.FC = () => {
           id: '107',
           name: 'Rotary Tiller',
           category: 'Tools',
-          imageUrl: 'https://images.unsplash.com/photo-1590422749897-47726e632a0e',
           owner: 'Sharma Agriculture',
           location: 'Jaipur, Rajasthan',
           available: true,
@@ -106,7 +99,6 @@ const Lending: React.FC = () => {
           id: '108',
           name: 'Rice Transplanter',
           category: 'Seeders',
-          imageUrl: 'https://images.unsplash.com/photo-1516467508483-a7212febe31a',
           owner: 'Bengal Agro',
           location: 'Kolkata, West Bengal',
           available: true,
@@ -116,7 +108,6 @@ const Lending: React.FC = () => {
           id: '109',
           name: 'Sprinkler System',
           category: 'Irrigation',
-          imageUrl: 'https://images.unsplash.com/photo-1591962738310-1fcc28db44cf',
           owner: 'Maharashtra Farms',
           location: 'Nagpur, Maharashtra',
           available: true,
@@ -275,15 +266,8 @@ const Lending: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {myBorrowings.map((item) => (
                 <Card key={item.id} className="overflow-hidden">
-                  <div className="h-40 overflow-hidden">
-                    <img 
-                      src={item.imageUrl || '/placeholder.svg'} 
-                      alt={item.name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/placeholder.svg';
-                      }}
-                    />
+                  <div className="h-40 bg-farmlink-light flex items-center justify-center">
+                    <Tag size={48} className="text-farmlink-accent opacity-20" />
                   </div>
                   <CardContent className="p-4">
                     <div className="flex items-center mb-2">

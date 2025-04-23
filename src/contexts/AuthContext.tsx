@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -11,6 +10,14 @@ interface User {
   phone?: string;
   joinDate?: string;
   profileImage?: string;
+  farmType?: string;
+  farmSize?: string;
+  employeeCount?: string;
+  mainCrops?: string;
+  certifications?: string;
+  yearEstablished?: string;
+  website?: string;
+  bioDescription?: string;
 }
 
 interface AuthContextType {
@@ -29,7 +36,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { toast } = useToast();
 
-  // Check if user is logged in from localStorage on initial load
   useEffect(() => {
     const storedUser = localStorage.getItem('farmlink_user');
     if (storedUser) {
@@ -45,10 +51,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = (email: string, password: string) => {
-    // In a real app, this would call an API to validate credentials
-    // For demo purposes, we'll accept any email/password combination
-    // or use a hardcoded demo account
-    
     let userData: User;
     
     if (email === 'demo@farmlink.com' && password === 'password123') {
@@ -59,7 +61,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         farmName: 'Demo Farm',
         location: 'Delhi, India',
         phone: '+91 7303231776',
-        joinDate: 'April 2023'
+        joinDate: 'April 2023',
+        farmType: 'Organic Farm',
+        farmSize: '25 acres',
+        employeeCount: '12',
+        mainCrops: 'Wheat, Rice, Vegetables',
+        certifications: 'Organic, Fair Trade',
+        yearEstablished: '2010',
+        website: 'www.demofarm.com',
+        bioDescription: 'A sustainable farm focusing on organic produce and fair trade practices.'
       };
     } else if (email === 'ritesh77@gmail.com' && password === 'password123') {
       userData = {
@@ -69,10 +79,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         farmName: 'Green Valley Farms',
         location: 'Amritsar, Punjab',
         phone: '+91 7303231776',
-        joinDate: 'January 2023'
+        joinDate: 'January 2023',
+        farmType: 'Mixed Farm',
+        farmSize: '40 acres',
+        employeeCount: '15',
+        mainCrops: 'Wheat, Corn, Vegetables',
+        certifications: 'Organic',
+        yearEstablished: '2008',
+        website: 'www.greenvalleyfarms.com',
+        bioDescription: 'Family-owned farm focusing on sustainable farming practices.'
       };
     } else {
-      // Generate a user based on the provided email
       userData = {
         id: `user-${Date.now()}`,
         name: email.split('@')[0],
@@ -93,7 +110,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signup = (name: string, email: string, password: string, farmName?: string, location?: string) => {
-    // In a real app, this would call an API to create a user
     const newUser: User = {
       id: `user-${Date.now()}`,
       name,

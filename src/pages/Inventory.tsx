@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import ProduceCard, { Produce } from '@/components/ProduceCard';
 import InventoryForm from '@/components/InventoryForm';
@@ -24,7 +23,6 @@ const Inventory: React.FC = () => {
       name: 'Tomatoes',
       quantity: 15,
       unit: 'kg',
-      imageUrl: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfca',
       harvestDate: new Date('2025-04-01'),
       expiryDate: new Date('2025-04-15'),
       farmName: 'Green Valley Farm',
@@ -36,7 +34,6 @@ const Inventory: React.FC = () => {
       name: 'Lettuce',
       quantity: 8,
       unit: 'boxes',
-      imageUrl: 'https://images.unsplash.com/photo-1556801712-76c8eb07bbc9',
       harvestDate: new Date('2025-04-02'),
       expiryDate: new Date('2025-04-08'),
       farmName: 'Green Valley Farm',
@@ -48,7 +45,6 @@ const Inventory: React.FC = () => {
       name: 'Carrots',
       quantity: 25,
       unit: 'kg',
-      imageUrl: 'https://images.unsplash.com/photo-1447175008436-054170c2e979',
       harvestDate: new Date('2025-04-01'),
       expiryDate: new Date('2025-04-30'),
       farmName: 'Green Valley Farm',
@@ -60,7 +56,6 @@ const Inventory: React.FC = () => {
       name: 'Apples',
       quantity: 40,
       unit: 'kg',
-      imageUrl: 'https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a',
       harvestDate: new Date('2025-04-01'),
       expiryDate: new Date('2025-04-25'),
       farmName: 'Green Valley Farm',
@@ -72,7 +67,6 @@ const Inventory: React.FC = () => {
       name: 'Wheat',
       quantity: 100,
       unit: 'kg',
-      imageUrl: 'https://images.unsplash.com/photo-1574323347407-f5e1bdbd3b8f',
       harvestDate: new Date('2025-03-25'),
       expiryDate: new Date('2025-06-25'),
       farmName: 'Green Valley Farm',

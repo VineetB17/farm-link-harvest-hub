@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
@@ -44,7 +43,6 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
       name,
       quantity: parseFloat(quantity),
       unit,
-      imageUrl: '/placeholder.svg', // Placeholder image
       harvestDate: new Date(harvestDate),
       expiryDate: new Date(expiryDate),
       farmName,
@@ -172,7 +170,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
               className="form-input"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              placeholder="e.g., Mumbai, Maharashtra"
+              placeholder="e.g., City, Region"
               required
             />
           </div>

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import ProduceCard, { Produce } from '@/components/ProduceCard';
 import { Search, Filter } from 'lucide-react';
@@ -31,11 +30,10 @@ const Marketplace: React.FC = () => {
           name: 'Organic Apples',
           quantity: 50,
           unit: 'kg',
-          imageUrl: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6',
           harvestDate: new Date('2025-04-01'),
           expiryDate: new Date('2025-04-20'),
           farmName: 'Sunny Hill Orchards',
-          location: 'Shimla, Himachal Pradesh',
+          location: 'Northwest Region',
           category: 'Fruits'
         },
         {
@@ -43,11 +41,10 @@ const Marketplace: React.FC = () => {
           name: 'Fresh Corn',
           quantity: 100,
           unit: 'pieces',
-          imageUrl: 'https://images.unsplash.com/photo-1551754655-cd27e38d2076',
           harvestDate: new Date('2025-04-03'),
           expiryDate: new Date('2025-04-15'),
           farmName: 'Golden Fields Farm',
-          location: 'Chandigarh, Punjab',
+          location: 'Northern Region',
           category: 'Vegetables'
         },
         {
@@ -55,11 +52,10 @@ const Marketplace: React.FC = () => {
           name: 'Kale',
           quantity: 20,
           unit: 'boxes',
-          imageUrl: 'https://images.unsplash.com/photo-1515472071456-47b5b388a350',
           harvestDate: new Date('2025-04-02'),
           expiryDate: new Date('2025-04-10'),
           farmName: 'River Valley Greens',
-          location: 'Ooty, Tamil Nadu',
+          location: 'Southern Hills',
           category: 'Vegetables'
         },
         {
@@ -67,11 +63,10 @@ const Marketplace: React.FC = () => {
           name: 'Potatoes',
           quantity: 75,
           unit: 'kg',
-          imageUrl: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655',
           harvestDate: new Date('2025-03-30'),
           expiryDate: new Date('2025-04-30'),
           farmName: 'Mountain View Farm',
-          location: 'Agra, Uttar Pradesh',
+          location: 'Central Plains',
           category: 'Vegetables'
         },
         {
@@ -79,11 +74,10 @@ const Marketplace: React.FC = () => {
           name: 'Bell Peppers',
           quantity: 30,
           unit: 'kg',
-          imageUrl: 'https://images.unsplash.com/photo-1563565375-f0d78e396063',
           harvestDate: new Date('2025-04-05'),
           expiryDate: new Date('2025-04-18'),
           farmName: 'Rainbow Gardens',
-          location: 'Nashik, Maharashtra',
+          location: 'Western Valley',
           category: 'Vegetables'
         },
         {
@@ -91,11 +85,10 @@ const Marketplace: React.FC = () => {
           name: 'Strawberries',
           quantity: 15,
           unit: 'boxes',
-          imageUrl: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6',
           harvestDate: new Date('2025-04-04'),
           expiryDate: new Date('2025-04-09'),
           farmName: 'Berry Best Farm',
-          location: 'Mahabaleshwar, Maharashtra',
+          location: 'Highland Region',
           category: 'Fruits'
         },
         {
@@ -103,11 +96,10 @@ const Marketplace: React.FC = () => {
           name: 'Organic Milk',
           quantity: 20,
           unit: 'liters',
-          imageUrl: 'https://images.unsplash.com/photo-1563636619-e9143da7973b',
           harvestDate: new Date('2025-04-06'),
           expiryDate: new Date('2025-04-12'),
           farmName: 'Happy Cow Dairy',
-          location: 'Anand, Gujarat',
+          location: 'Eastern Grasslands',
           category: 'Dairy'
         },
         {
@@ -115,11 +107,10 @@ const Marketplace: React.FC = () => {
           name: 'Almonds',
           quantity: 35,
           unit: 'kg',
-          imageUrl: 'https://images.unsplash.com/photo-1508061538535-6effdf9eb6f5',
           harvestDate: new Date('2025-03-25'),
           expiryDate: new Date('2025-06-25'),
           farmName: 'Nutty Farm',
-          location: 'Pune, Maharashtra',
+          location: 'Western Region',
           category: 'Nuts'
         },
         {
@@ -127,11 +118,10 @@ const Marketplace: React.FC = () => {
           name: 'Basmati Rice',
           quantity: 200,
           unit: 'kg',
-          imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c',
           harvestDate: new Date('2025-03-15'),
           expiryDate: new Date('2025-07-15'),
           farmName: 'Ganges Valley Farm',
-          location: 'Dehradun, Uttarakhand',
+          location: 'Northern Valley',
           category: 'Grains'
         },
         {
@@ -139,11 +129,10 @@ const Marketplace: React.FC = () => {
           name: 'Mangoes',
           quantity: 60,
           unit: 'kg',
-          imageUrl: 'https://images.unsplash.com/photo-1501746877-14782df58970',
           harvestDate: new Date('2025-04-10'),
           expiryDate: new Date('2025-04-25'),
           farmName: 'Tropical Paradise',
-          location: 'Ratnagiri, Maharashtra',
+          location: 'Coastal Region',
           category: 'Fruits'
         },
         {
@@ -151,11 +140,10 @@ const Marketplace: React.FC = () => {
           name: 'Coconut',
           quantity: 80,
           unit: 'pieces',
-          imageUrl: 'https://images.unsplash.com/photo-1581375321224-79da6fd32f6e',
           harvestDate: new Date('2025-04-08'),
           expiryDate: new Date('2025-05-20'),
           farmName: 'Coastal Growers',
-          location: 'Kochi, Kerala',
+          location: 'Coastal Plains',
           category: 'Nuts'
         },
         {
@@ -163,11 +151,10 @@ const Marketplace: React.FC = () => {
           name: 'Paneer',
           quantity: 25,
           unit: 'kg',
-          imageUrl: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7',
           harvestDate: new Date('2025-04-07'),
           expiryDate: new Date('2025-04-15'),
           farmName: 'Pure Dairy',
-          location: 'Karnal, Haryana',
+          location: 'Northern Plains',
           category: 'Dairy'
         }
       ];
