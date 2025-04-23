@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Filter, PlusCircle, Check } from 'lucide-react';
+import { Search, Filter, PlusCircle } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
 import EquipmentCard, { Equipment } from '@/components/EquipmentCard';
+import AddLendingItemForm from '@/components/lending/AddLendingItemForm';
+import BorrowRequestForm from '@/components/lending/BorrowRequestForm';
 import { nanoid } from 'nanoid';
 import { Tag } from 'lucide-react';
 
@@ -22,9 +25,12 @@ const Lending: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [loading, setLoading] = useState(true);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [showBorrowForm, setShowBorrowForm] = useState(false);
+  const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
   const [myBorrowings, setMyBorrowings] = useState<Equipment[]>([]);
   const { toast } = useToast();
-  
+
   useEffect(() => {
     // In a real app, this would be an API call
     // For now, let's simulate loading sample data
@@ -122,6 +128,27 @@ const Lending: React.FC = () => {
     loadSampleData();
   }, []);
 
+  const handleAddEquipment = (newItem: Equipment) => {
+    setEquipment(prev => [newItem, ...prev]);
+    setShowAddForm(false);
+  };
+
+  const handleBorrowRequest = (request: any) => {
+    setEquipment(prev => prev.map(item => {
+      if (item.id === request.equipmentId) {
+        return { ...item, available: false };
+      }
+      return item;
+    }));
+    setShowBorrowForm(false);
+    setSelectedEquipment(null);
+  };
+
+  const handleBorrowClick = (equipment: Equipment) => {
+    setSelectedEquipment(equipment);
+    setShowBorrowForm(true);
+  };
+
   const handleBorrowEquipment = (id: string) => {
     setEquipment(prev => prev.map(item => {
       if (item.id === id) {
@@ -200,11 +227,36 @@ const Lending: React.FC = () => {
       </div>
       
       <div className="flex justify-end mb-6">
-        <button className="btn-primary flex items-center">
+        <Button 
+          onClick={() => setShowAddForm(true)}
+          className="flex items-center"
+        >
           <PlusCircle size={18} className="mr-2" />
           List Equipment
-        </button>
+        </Button>
       </div>
+
+      {showAddForm && (
+        <div className="mb-6">
+          <AddLendingItemForm 
+            onSubmit={handleAddEquipment}
+            onClose={() => setShowAddForm(false)}
+          />
+        </div>
+      )}
+
+      {showBorrowForm && selectedEquipment && (
+        <div className="mb-6">
+          <BorrowRequestForm 
+            equipment={selectedEquipment}
+            onSubmit={handleBorrowRequest}
+            onClose={() => {
+              setShowBorrowForm(false);
+              setSelectedEquipment(null);
+            }}
+          />
+        </div>
+      )}
 
       <Tabs defaultValue="available">
         <TabsList>
@@ -225,8 +277,8 @@ const Lending: React.FC = () => {
                   {availableItems.map((item) => (
                     <EquipmentCard 
                       key={item.id} 
-                      equipment={item} 
-                      onBorrow={handleBorrowEquipment}
+                      equipment={item}
+                      onBorrow={() => handleBorrowClick(item)}
                     />
                   ))}
                 </div>
@@ -281,7 +333,7 @@ const Lending: React.FC = () => {
                       onClick={() => handleReturnEquipment(item.id)}
                       className="w-full py-2 rounded-md text-center bg-farmlink-primary text-white hover:bg-farmlink-primary/90 flex items-center justify-center"
                     >
-                      <Check size={16} className="mr-2" />
+                      <Tag size={16} className="mr-2" />
                       Return Equipment
                     </button>
                   </CardContent>

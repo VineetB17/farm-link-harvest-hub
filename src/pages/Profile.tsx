@@ -4,7 +4,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import ProfileDetails from '@/components/profile/ProfileDetails';
-import LendingBorrowingSection from '@/components/profile/LendingBorrowingSection';
 
 const Profile: React.FC = () => {
   const { user } = useAuth();
@@ -18,18 +17,6 @@ const Profile: React.FC = () => {
     email: user?.email || '',
     website: user?.website || '',
   });
-  
-  const lendingItems = [
-    { id: '1', name: 'Tractor', category: 'Equipment', borrower: 'Green Valley Farms', dueDate: '2025-05-01', condition: 'Excellent' },
-    { id: '2', name: 'Irrigation System', category: 'Equipment', borrower: 'Mountain View Farm', dueDate: '2025-04-20', condition: 'Good' },
-    { id: '3', name: 'Seed Drill', category: 'Tools', borrower: 'Sunrise Agriculture', dueDate: '2025-04-25', condition: 'Fair' },
-  ];
-  
-  const borrowingItems = [
-    { id: '1', name: 'Harvester', category: 'Equipment', lender: 'Valley Farm Co.', dueDate: '2025-04-15', lentSince: '2025-03-15' },
-    { id: '2', name: 'Seed Spreader', category: 'Tools', lender: 'Green Fields Ltd', dueDate: '2025-04-25', lentSince: '2025-03-25' },
-    { id: '3', name: 'Sprinkler System', category: 'Irrigation', lender: 'Farm Tech Solutions', dueDate: '2025-05-05', lentSince: '2025-04-05' },
-  ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -69,11 +56,6 @@ const Profile: React.FC = () => {
           onInputChange={handleInputChange}
         />
       </div>
-
-      <LendingBorrowingSection 
-        lendingItems={lendingItems}
-        borrowingItems={borrowingItems}
-      />
     </div>
   );
 };
