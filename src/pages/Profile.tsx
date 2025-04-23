@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { User, MapPin, Mail, Phone, Tractor, Calendar, Settings } from 'lucide-react';
+import { User, MapPin, Mail, Phone, Tractor, Calendar, Settings, Building2, Users2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from '@/components/ui/use-toast';
 import { Input } from '@/components/ui/input';
@@ -13,13 +13,20 @@ const Profile: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || '',
-    farmName: user?.farmName || 'Green Valley Farm',
-    location: user?.location || 'Amritsar, Punjab',
-    phone: '+91 7303231776',
-    joinDate: 'April 2023'
+    farmName: user?.farmName || '',
+    location: user?.location || '',
+    phone: user?.phone || '',
+    email: user?.email || '',
+    farmType: user?.farmType || 'Crop Farm',
+    farmSize: user?.farmSize || '',
+    employeeCount: user?.employeeCount || '',
+    mainCrops: user?.mainCrops || '',
+    certifications: user?.certifications || '',
+    yearEstablished: user?.yearEstablished || '',
+    website: user?.website || '',
+    bioDescription: user?.bioDescription || ''
   });
   
-  // Sample data for profile sections
   const lendingItems = [
     { id: '1', name: 'Tractor', category: 'Equipment', borrower: 'Sharma Farms', dueDate: '2025-05-01', condition: 'Excellent' },
     { id: '2', name: 'Irrigation System', category: 'Equipment', borrower: 'Singh Orchards', dueDate: '2025-04-20', condition: 'Good' },
@@ -39,7 +46,7 @@ const Profile: React.FC = () => {
     { id: '4', crop: 'Pulses', season: 'Rabi 2022-23', area: '3 acres', yield: '10 quintals/acre', notes: 'Good quality product, sold above MSP' }
   ];
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -64,7 +71,7 @@ const Profile: React.FC = () => {
           </div>
           <div className="ml-4">
             <h1 className="text-2xl md:text-3xl font-bold text-farmlink-secondary">My Profile</h1>
-            <p className="text-gray-600">Welcome, {user?.name || 'Farmer'}</p>
+            <p className="text-gray-600">Welcome, {formData.name}</p>
           </div>
         </div>
         
@@ -85,36 +92,64 @@ const Profile: React.FC = () => {
           <CardContent>
             {isEditing ? (
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Farmer Name</label>
-                  <Input 
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Full Name</label>
+                    <Input name="name" value={formData.name} onChange={handleInputChange} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Farm Name</label>
+                    <Input name="farmName" value={formData.farmName} onChange={handleInputChange} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Location</label>
+                    <Input name="location" value={formData.location} onChange={handleInputChange} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Phone</label>
+                    <Input name="phone" value={formData.phone} onChange={handleInputChange} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Email</label>
+                    <Input name="email" value={formData.email} onChange={handleInputChange} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Farm Type</label>
+                    <Input name="farmType" value={formData.farmType} onChange={handleInputChange} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Farm Size</label>
+                    <Input name="farmSize" value={formData.farmSize} onChange={handleInputChange} placeholder="e.g., 50 acres" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Number of Employees</label>
+                    <Input name="employeeCount" value={formData.employeeCount} onChange={handleInputChange} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Main Crops/Products</label>
+                    <Input name="mainCrops" value={formData.mainCrops} onChange={handleInputChange} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Certifications</label>
+                    <Input name="certifications" value={formData.certifications} onChange={handleInputChange} placeholder="e.g., Organic, Fair Trade" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Year Established</label>
+                    <Input name="yearEstablished" value={formData.yearEstablished} onChange={handleInputChange} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Website</label>
+                    <Input name="website" value={formData.website} onChange={handleInputChange} />
+                  </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Farm Name</label>
-                  <Input 
-                    name="farmName"
-                    value={formData.farmName}
+                  <label className="block text-sm font-medium mb-1">Farm Description</label>
+                  <textarea
+                    name="bioDescription"
+                    value={formData.bioDescription}
                     onChange={handleInputChange}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Location</label>
-                  <Input 
-                    name="location"
-                    value={formData.location}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Contact Phone</label>
-                  <Input 
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
+                    className="w-full h-24 p-2 border rounded-md"
+                    placeholder="Tell us about your farm..."
                   />
                 </div>
                 <button 
@@ -129,7 +164,7 @@ const Profile: React.FC = () => {
                 <div className="flex items-start">
                   <User size={20} className="text-farmlink-primary mt-1 mr-3" />
                   <div>
-                    <h3 className="font-medium text-gray-700">Farmer Name</h3>
+                    <h3 className="font-medium text-gray-700">Full Name</h3>
                     <p>{formData.name}</p>
                   </div>
                 </div>
@@ -139,6 +174,14 @@ const Profile: React.FC = () => {
                   <div>
                     <h3 className="font-medium text-gray-700">Farm Name</h3>
                     <p>{formData.farmName}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <Building2 size={20} className="text-farmlink-primary mt-1 mr-3" />
+                  <div>
+                    <h3 className="font-medium text-gray-700">Farm Type</h3>
+                    <p>{formData.farmType}</p>
                   </div>
                 </div>
                 
@@ -153,24 +196,32 @@ const Profile: React.FC = () => {
                 <div className="flex items-start">
                   <Mail size={20} className="text-farmlink-primary mt-1 mr-3" />
                   <div>
-                    <h3 className="font-medium text-gray-700">Contact Email</h3>
-                    <p>{user?.email || 'ritesh77@gmail.com'}</p>
+                    <h3 className="font-medium text-gray-700">Email</h3>
+                    <p>{formData.email}</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
                   <Phone size={20} className="text-farmlink-primary mt-1 mr-3" />
                   <div>
-                    <h3 className="font-medium text-gray-700">Phone Number</h3>
+                    <h3 className="font-medium text-gray-700">Phone</h3>
                     <p>{formData.phone}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <Users2 size={20} className="text-farmlink-primary mt-1 mr-3" />
+                  <div>
+                    <h3 className="font-medium text-gray-700">Employees</h3>
+                    <p>{formData.employeeCount}</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
                   <Calendar size={20} className="text-farmlink-primary mt-1 mr-3" />
                   <div>
-                    <h3 className="font-medium text-gray-700">Member Since</h3>
-                    <p>{formData.joinDate}</p>
+                    <h3 className="font-medium text-gray-700">Established</h3>
+                    <p>{formData.yearEstablished}</p>
                   </div>
                 </div>
               </div>
