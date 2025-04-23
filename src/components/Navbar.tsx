@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, User, LogOut, Settings } from 'lucide-react';
+import { Menu, X, User, LogOut, Settings, CloudRain, Home, ShoppingCart, Package, Warehouse } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -39,14 +40,26 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onLogout }) => {
               {isMenuOpen && (
                 <div className="absolute top-16 left-0 right-0 bg-white z-50 shadow-md">
                   <div className="farmlink-container py-4 flex flex-col gap-4">
-                    <Link to="/" className="text-gray-700 hover:text-farmlink-primary" onClick={toggleMenu}>Home</Link>
-                    <Link to="/marketplace" className="text-gray-700 hover:text-farmlink-primary" onClick={toggleMenu}>Marketplace</Link>
+                    <Link to="/" className="text-gray-700 hover:text-farmlink-primary flex items-center" onClick={toggleMenu}>
+                      <Home size={18} className="mr-2" /> Home
+                    </Link>
+                    <Link to="/marketplace" className="text-gray-700 hover:text-farmlink-primary flex items-center" onClick={toggleMenu}>
+                      <ShoppingCart size={18} className="mr-2" /> Marketplace
+                    </Link>
                     {isLoggedIn ? (
                       <>
-                        <Link to="/inventory" className="text-gray-700 hover:text-farmlink-primary" onClick={toggleMenu}>My Inventory</Link>
-                        <Link to="/lending" className="text-gray-700 hover:text-farmlink-primary" onClick={toggleMenu}>Equipment Lending</Link>
-                        <Link to="/weather" className="text-gray-700 hover:text-farmlink-primary" onClick={toggleMenu}>Weather</Link>
-                        <Link to="/profile" className="text-gray-700 hover:text-farmlink-primary" onClick={toggleMenu}>My Profile</Link>
+                        <Link to="/inventory" className="text-gray-700 hover:text-farmlink-primary flex items-center" onClick={toggleMenu}>
+                          <Warehouse size={18} className="mr-2" /> My Inventory
+                        </Link>
+                        <Link to="/lending" className="text-gray-700 hover:text-farmlink-primary flex items-center" onClick={toggleMenu}>
+                          <Package size={18} className="mr-2" /> Equipment Lending
+                        </Link>
+                        <Link to="/weather" className="text-gray-700 hover:text-farmlink-primary flex items-center" onClick={toggleMenu}>
+                          <CloudRain size={18} className="mr-2" /> Weather
+                        </Link>
+                        <Link to="/profile" className="text-gray-700 hover:text-farmlink-primary flex items-center" onClick={toggleMenu}>
+                          <User size={18} className="mr-2" /> My Profile
+                        </Link>
                         <button 
                           onClick={() => {
                             onLogout();
@@ -54,14 +67,17 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onLogout }) => {
                           }}
                           className="flex items-center text-gray-700 hover:text-farmlink-primary"
                         >
-                          <LogOut size={18} className="mr-1" />
-                          Logout
+                          <LogOut size={18} className="mr-2" /> Logout
                         </button>
                       </>
                     ) : (
                       <>
-                        <Link to="/login" className="text-gray-700 hover:text-farmlink-primary" onClick={toggleMenu}>Login</Link>
-                        <Link to="/signup" className="btn-primary" onClick={toggleMenu}>Sign Up</Link>
+                        <Link to="/login" className="text-gray-700 hover:text-farmlink-primary flex items-center" onClick={toggleMenu}>
+                          <User size={18} className="mr-2" /> Login
+                        </Link>
+                        <Link to="/signup" className="btn-primary flex items-center justify-center" onClick={toggleMenu}>
+                          Sign Up
+                        </Link>
                       </>
                     )}
                   </div>
@@ -71,13 +87,23 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onLogout }) => {
           ) : (
             <div className="flex items-center space-x-8">
               <div className="hidden md:flex space-x-8">
-                <Link to="/" className="text-gray-700 hover:text-farmlink-primary">Home</Link>
-                <Link to="/marketplace" className="text-gray-700 hover:text-farmlink-primary">Marketplace</Link>
+                <Link to="/" className="text-gray-700 hover:text-farmlink-primary flex items-center">
+                  <Home size={18} className="mr-1" /> Home
+                </Link>
+                <Link to="/marketplace" className="text-gray-700 hover:text-farmlink-primary flex items-center">
+                  <ShoppingCart size={18} className="mr-1" /> Marketplace
+                </Link>
                 {isLoggedIn && (
                   <>
-                    <Link to="/inventory" className="text-gray-700 hover:text-farmlink-primary">My Inventory</Link>
-                    <Link to="/lending" className="text-gray-700 hover:text-farmlink-primary">Equipment Lending</Link>
-                    <Link to="/weather" className="text-gray-700 hover:text-farmlink-primary">Weather</Link>
+                    <Link to="/inventory" className="text-gray-700 hover:text-farmlink-primary flex items-center">
+                      <Warehouse size={18} className="mr-1" /> My Inventory
+                    </Link>
+                    <Link to="/lending" className="text-gray-700 hover:text-farmlink-primary flex items-center">
+                      <Package size={18} className="mr-1" /> Equipment Lending
+                    </Link>
+                    <Link to="/weather" className="text-gray-700 hover:text-farmlink-primary flex items-center">
+                      <CloudRain size={18} className="mr-1" /> Weather
+                    </Link>
                   </>
                 )}
               </div>

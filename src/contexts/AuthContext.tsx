@@ -8,14 +8,18 @@ interface User {
   email: string;
   farmName?: string;
   location?: string;
+  phone?: string;
+  joinDate?: string;
+  profileImage?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   isLoggedIn: boolean;
   login: (email: string, password: string) => void;
-  signup: (name: string, email: string, password: string) => void;
+  signup: (name: string, email: string, password: string, farmName?: string, location?: string) => void;
   logout: () => void;
+  updateUserProfile: (userData: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -53,7 +57,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         name: 'Demo User',
         email: 'demo@farmlink.com',
         farmName: 'Demo Farm',
-        location: 'Portland, OR'
+        location: 'Delhi, India',
+        phone: '+91 7303231776',
+        joinDate: 'April 2023'
+      };
+    } else if (email === 'ritesh77@gmail.com' && password === 'password123') {
+      userData = {
+        id: 'user-ritesh',
+        name: 'Ritesh Kumar',
+        email: 'ritesh77@gmail.com',
+        farmName: 'Green Valley Farms',
+        location: 'Amritsar, Punjab',
+        phone: '+91 7303231776',
+        joinDate: 'January 2023'
       };
     } else {
       // Generate a user based on the provided email
@@ -61,25 +77,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: `user-${Date.now()}`,
         name: email.split('@')[0],
         email: email,
+        phone: '+91 7303231776',
+        joinDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' })
       };
     }
     
     setUser(userData);
     setIsLoggedIn(true);
     localStorage.setItem('farmlink_user', JSON.stringify(userData));
+    
+    toast({
+      title: 'Login Successful',
+      description: `Welcome back, ${userData.name}!`,
+    });
   };
 
-  const signup = (name: string, email: string, password: string) => {
+  const signup = (name: string, email: string, password: string, farmName?: string, location?: string) => {
     // In a real app, this would call an API to create a user
     const newUser: User = {
       id: `user-${Date.now()}`,
       name,
       email,
+      farmName,
+      location,
+      phone: '+91 7303231776',
+      joinDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' })
     };
     
     setUser(newUser);
     setIsLoggedIn(true);
     localStorage.setItem('farmlink_user', JSON.stringify(newUser));
+    
+    toast({
+      title: 'Account Created',
+      description: `Welcome to FarmLink, ${name}!`,
+    });
+  };
+
+  const updateUserProfile = (userData: Partial<User>) => {
+    if (!user) return;
+    
+    const updatedUser = {
+      ...user,
+      ...userData
+    };
+    
+    setUser(updatedUser);
+    localStorage.setItem('farmlink_user', JSON.stringify(updatedUser));
+    
+    toast({
+      title: 'Profile Updated',
+      description: 'Your profile information has been successfully updated',
+    });
   };
 
   const logout = () => {
@@ -94,7 +143,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoggedIn, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, isLoggedIn, login, signup, logout, updateUserProfile }}>
       {children}
     </AuthContext.Provider>
   );
