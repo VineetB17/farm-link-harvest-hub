@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { User, MapPin, Mail, Phone, Farm, Calendar, Settings } from 'lucide-react';
+import { User, MapPin, Mail, Phone, Tractor, Calendar, Settings } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from '@/components/ui/use-toast';
 import { Input } from '@/components/ui/input';
@@ -136,7 +135,7 @@ const Profile: React.FC = () => {
                 </div>
                 
                 <div className="flex items-start">
-                  <Farm size={20} className="text-farmlink-primary mt-1 mr-3" />
+                  <Tractor size={20} className="text-farmlink-primary mt-1 mr-3" />
                   <div>
                     <h3 className="font-medium text-gray-700">Farm Name</h3>
                     <p>{formData.farmName}</p>
