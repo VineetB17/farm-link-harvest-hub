@@ -29,7 +29,20 @@ export interface BorrowRequest {
   status: string;
   created_at: string;
   updated_at: string;
-  equipment_listings?: Equipment; // Add this to allow joining equipment data
+  equipment_listings?: {
+    id: string;
+    name: string;
+    category: string;
+    owner_id: string;
+    owner_name: string;
+    location: string;
+    available: boolean;
+    description: string;
+    status: string; // Changed from the strict type to string to match what Supabase returns
+    created_at?: string;
+    updated_at?: string;
+    image_url?: string | null;
+  }; // Defining the type explicitly with status as string
 }
 
 export interface LendingMessage {
