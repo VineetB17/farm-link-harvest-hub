@@ -32,8 +32,21 @@ const Chat = () => {
     e.preventDefault();
     if (!newMessage.trim() || !selectedUser) return;
 
-    await sendMessage(newMessage);
-    setNewMessage('');
+    try {
+      await sendMessage(newMessage);
+      setNewMessage('');
+      toast({
+        title: "Message sent",
+        description: "Your message has been sent successfully"
+      });
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send message",
+        variant: "destructive"
+      });
+    }
   };
 
   if (!user) {
@@ -55,7 +68,10 @@ const Chat = () => {
             Search Users
           </h2>
           <UserSearchInput 
-            onSelectUser={setSelectedUser}
+            onSelectUser={(user) => {
+              console.log('Selected user in Chat:', user);
+              setSelectedUser(user);
+            }}
             currentUserId={user.id}
           />
 

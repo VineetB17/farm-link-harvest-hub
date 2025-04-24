@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Search } from 'lucide-react';
+import { UserSearch } from 'lucide-react';
 
 interface UserSearchInputProps {
   onSelectUser: (user: { id: string; name: string; farmName?: string }) => void;
@@ -24,14 +24,17 @@ const UserSearchInput = ({ onSelectUser, currentUserId }: UserSearchInputProps) 
 
       setLoading(true);
       try {
+        // Query the profiles table for users that match the search query
         const { data, error } = await supabase
           .from('profiles')
           .select('id, name, farm_name')
           .neq('id', currentUserId)
           .ilike('name', `%${searchQuery}%`)
-          .limit(5);
+          .limit(10);
 
         if (error) throw error;
+        
+        console.log('Search results:', data);
         setSearchResults(data || []);
       } catch (error) {
         console.error('Error searching users:', error);
@@ -40,6 +43,7 @@ const UserSearchInput = ({ onSelectUser, currentUserId }: UserSearchInputProps) 
       }
     };
 
+    // Add a debounce to prevent too many requests
     const debounceTimeout = setTimeout(searchUsers, 300);
     return () => clearTimeout(debounceTimeout);
   }, [searchQuery, currentUserId]);
@@ -47,7 +51,7 @@ const UserSearchInput = ({ onSelectUser, currentUserId }: UserSearchInputProps) 
   return (
     <div className="relative">
       <div className="relative">
-        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+        <UserSearch className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search users by name..."
           value={searchQuery}
@@ -57,12 +61,17 @@ const UserSearchInput = ({ onSelectUser, currentUserId }: UserSearchInputProps) 
       </div>
       
       {searchResults.length > 0 && (
-        <ScrollArea className="absolute z-10 mt-1 max-h-48 w-full rounded-md border bg-white shadow-lg">
+        <ScrollArea className="absolute z-10 mt-1 max-h-60 w-full rounded-md border bg-white shadow-lg">
           {searchResults.map((user) => (
             <button
               key={user.id}
               onClick={() => {
-                onSelectUser(user);
+                console.log('Selected user:', user);
+                onSelectUser({
+                  id: user.id,
+                  name: user.name,
+                  farmName: user.farm_name
+                });
                 setSearchQuery('');
                 setSearchResults([]);
               }}
@@ -75,6 +84,18 @@ const UserSearchInput = ({ onSelectUser, currentUserId }: UserSearchInputProps) 
             </button>
           ))}
         </ScrollArea>
+      )}
+
+      {loading && (
+        <div className="absolute z-10 mt-1 w-full rounded-md border bg-white p-4 shadow-lg">
+          Searching...
+        </div>
+      )}
+      
+      {searchQuery && searchResults.length === 0 && !loading && (
+        <div className="absolute z-10 mt-1 w-full rounded-md border bg-white p-4 shadow-lg">
+          No users found
+        </div>
       )}
     </div>
   );
