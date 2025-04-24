@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import ProduceCard, { Produce } from '@/components/ProduceCard';
 import { Search, Filter, ShoppingCart, Trash2 } from 'lucide-react';
@@ -48,7 +49,8 @@ const Marketplace: React.FC = () => {
         location: item.location,
         category: item.category,
         price: Number(item.price),
-        image_url: item.image_url
+        image_url: item.image_url,
+        user_id: item.user_id
       }));
 
       setMarketItems(formattedData);
@@ -167,6 +169,13 @@ interface MarketplaceCardProps {
 }
 
 const MarketplaceCard: React.FC<MarketplaceCardProps> = ({ produce, isOwner, onDelete }) => {
+  // Add console log to help debug ownership issue
+  console.log('Item ownership check:', { 
+    isOwner, 
+    produceUserId: produce.user_id, 
+    itemName: produce.name 
+  });
+  
   return (
     <div className="p-4 bg-white rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition-all">
       {produce.image_url && (
