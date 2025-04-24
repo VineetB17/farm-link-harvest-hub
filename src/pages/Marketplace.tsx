@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import ProduceCard, { Produce } from '@/components/ProduceCard';
 import { Search, Filter, Trash2, Handshake } from 'lucide-react';
@@ -73,7 +74,8 @@ const Marketplace: React.FC = () => {
         .select(`
           *,
           marketplace_products!inner(name, user_id)
-        `);
+        `)
+        .eq('status', 'pending'); // Only fetch pending offers
 
       if (error) throw error;
 
@@ -168,7 +170,7 @@ const Marketplace: React.FC = () => {
       });
 
       fetchMarketplaceItems();
-      fetchMarketplaceOffers();
+      fetchMarketplaceOffers(); // Refresh offers after acceptance
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -192,7 +194,7 @@ const Marketplace: React.FC = () => {
         description: 'Offer rejected',
       });
 
-      fetchMarketplaceOffers();
+      fetchMarketplaceOffers(); // Refresh offers after rejection
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -288,6 +290,26 @@ interface MarketplaceCardProps {
 }
 
 const MarketplaceCard: React.FC<MarketplaceCardProps> = ({ produce, isOwner, onDelete, onMakeOffer }) => {
+  const [hasOffers, setHasOffers] = useState(false);
+
+  useEffect(() => {
+    // Check if this product has any pending offers
+    const checkOffers = async () => {
+      const { data, error } = await supabase
+        .from('marketplace_offers')
+        .select('id')
+        .eq('product_id', produce.id)
+        .eq('status', 'pending')
+        .limit(1);
+      
+      if (!error && data) {
+        setHasOffers(data.length > 0);
+      }
+    };
+    
+    checkOffers();
+  }, [produce.id]);
+
   return (
     <div className="p-4 bg-white rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition-all">
       {produce.image_url && (
@@ -330,15 +352,23 @@ const MarketplaceCard: React.FC<MarketplaceCardProps> = ({ produce, isOwner, onD
         <div className="text-sm text-gray-600">
           Expires: {produce.expiryDate.toLocaleDateString()}
         </div>
+        
         {isOwner ? (
-          <Button 
-            variant="destructive" 
-            size="sm"
-            onClick={() => onDelete(produce.id)}
-          >
-            <Trash2 size={16} className="mr-1" />
-            Remove
-          </Button>
+          <div className="flex items-center">
+            {hasOffers && (
+              <span className="mr-2 text-xs px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full">
+                Has offers
+              </span>
+            )}
+            <Button 
+              variant="destructive" 
+              size="sm"
+              onClick={() => onDelete(produce.id)}
+            >
+              <Trash2 size={16} className="mr-1" />
+              Remove
+            </Button>
+          </div>
         ) : (
           <Button 
             variant="default"
