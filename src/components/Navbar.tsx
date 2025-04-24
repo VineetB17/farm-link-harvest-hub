@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, User, LogOut, Settings, CloudRain, Home, ShoppingCart, Package, Warehouse, MessageSquare } from 'lucide-react';
+import { Menu, X, User, LogOut, Settings, CloudRain, Home, ShoppingCart, Package, Warehouse } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/AuthContext';
@@ -56,9 +56,6 @@ const Navbar: React.FC = () => {
                         <Link to="/profile" className="text-gray-700 hover:text-farmlink-primary flex items-center" onClick={toggleMenu}>
                           <User size={18} className="mr-2" /> My Profile
                         </Link>
-                        <Link to="/chat" className="text-gray-700 hover:text-farmlink-primary flex items-center" onClick={toggleMenu}>
-                          <MessageSquare size={18} className="mr-2" /> Messages
-                        </Link>
                         <button 
                           onClick={() => {
                             logout();
@@ -103,13 +100,6 @@ const Navbar: React.FC = () => {
                     <Link to="/weather" className="text-gray-700 hover:text-farmlink-primary flex items-center">
                       <CloudRain size={18} className="mr-1" /> Weather
                     </Link>
-                    {isLoggedIn && (
-                      <>
-                        <Link to="/chat" className="text-gray-700 hover:text-farmlink-primary flex items-center">
-                          <MessageSquare size={18} className="mr-1" /> Messages
-                        </Link>
-                      </>
-                    )}
                   </>
                 )}
               </div>
