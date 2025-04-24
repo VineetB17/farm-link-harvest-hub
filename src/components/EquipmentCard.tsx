@@ -15,13 +15,13 @@ export interface Equipment {
 
 interface EquipmentCardProps {
   equipment: Equipment;
-  onBorrow?: (id: string) => void;
+  onBorrow?: (equipment: Equipment) => void;
 }
 
 const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment, onBorrow }) => {
   const handleBorrowClick = () => {
     if (equipment.available && onBorrow) {
-      onBorrow(equipment.id);
+      onBorrow(equipment);
     }
   };
 

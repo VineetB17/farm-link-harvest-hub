@@ -163,7 +163,8 @@ const Lending: React.FC = () => {
     if (selectedEquipment) {
       setRequestedItems(prev => [...prev, { 
         ...selectedEquipment, 
-        status: 'requested' as const 
+        status: 'requested' as const,
+        available: false 
       }]);
     }
     

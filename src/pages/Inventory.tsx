@@ -157,7 +157,7 @@ const Inventory: React.FC = () => {
             <button
               onClick={() => handleRemoveProduce(produce.id)}
               className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-              title="Remove item"
+              aria-label="Remove item"
             >
               <Trash2 size={16} />
             </button>
