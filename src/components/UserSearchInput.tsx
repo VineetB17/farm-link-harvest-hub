@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { UserSearch } from 'lucide-react';
+import { UserSearch, Loader2 } from 'lucide-react';
 
 interface UserSearchInputProps {
   onSelectUser: (user: { id: string; name: string; farmName?: string }) => void;
@@ -14,16 +14,22 @@ const UserSearchInput = ({ onSelectUser, currentUserId }: UserSearchInputProps) 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const searchUsers = async () => {
       if (!searchQuery.trim()) {
         setSearchResults([]);
+        setError(null);
         return;
       }
 
       setLoading(true);
+      setError(null);
+      
       try {
+        console.log('Searching for users with query:', searchQuery);
+        
         // Query the profiles table for users that match the search query
         const { data, error } = await supabase
           .from('profiles')
@@ -32,12 +38,22 @@ const UserSearchInput = ({ onSelectUser, currentUserId }: UserSearchInputProps) 
           .ilike('name', `%${searchQuery}%`)
           .limit(10);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error searching users:', error);
+          setError('Failed to search users');
+          throw error;
+        }
         
         console.log('Search results:', data);
+        
+        if (data && data.length === 0) {
+          setError('No users found matching your search');
+        }
+        
         setSearchResults(data || []);
       } catch (error) {
         console.error('Error searching users:', error);
+        setError('An error occurred while searching');
       } finally {
         setLoading(false);
       }
@@ -75,7 +91,7 @@ const UserSearchInput = ({ onSelectUser, currentUserId }: UserSearchInputProps) 
                 setSearchQuery('');
                 setSearchResults([]);
               }}
-              className="w-full px-4 py-2 text-left hover:bg-gray-100"
+              className="w-full px-4 py-2 text-left hover:bg-gray-100 flex flex-col"
             >
               <div className="font-medium">{user.name}</div>
               {user.farm_name && (
@@ -87,14 +103,15 @@ const UserSearchInput = ({ onSelectUser, currentUserId }: UserSearchInputProps) 
       )}
 
       {loading && (
-        <div className="absolute z-10 mt-1 w-full rounded-md border bg-white p-4 shadow-lg">
+        <div className="absolute z-10 mt-1 w-full rounded-md border bg-white p-4 shadow-lg flex items-center justify-center">
+          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
           Searching...
         </div>
       )}
       
-      {searchQuery && searchResults.length === 0 && !loading && (
-        <div className="absolute z-10 mt-1 w-full rounded-md border bg-white p-4 shadow-lg">
-          No users found
+      {error && !loading && searchQuery && (
+        <div className="absolute z-10 mt-1 w-full rounded-md border bg-white p-4 shadow-lg text-red-500">
+          {error}
         </div>
       )}
     </div>
