@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import ProduceCard, { Produce } from '@/components/ProduceCard';
 import InventoryForm from '@/components/InventoryForm';
@@ -177,9 +176,9 @@ const Inventory: React.FC = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredInventory.map((produce) => (
-                <div key={produce.id} className="relative">
+                <div key={produce.id} className="relative group">
                   <ProduceCard produce={produce} />
-                  <div className="absolute top-2 right-2 flex space-x-2">
+                  <div className="absolute top-2 right-2 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={() => {
                         setSelectedItem(produce);
@@ -228,7 +227,6 @@ const Inventory: React.FC = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Add to Marketplace Dialog */}
       <Dialog open={isAddingToMarketplace} onOpenChange={setIsAddingToMarketplace}>
         <DialogContent>
           <DialogHeader>
@@ -268,7 +266,6 @@ const Inventory: React.FC = () => {
                   step="0.01"
                   required
                   onKeyDown={(e) => {
-                    // Allow user to submit form with Enter key
                     if (e.key === 'Enter') {
                       const input = e.target as HTMLInputElement;
                       const price = parseFloat(input.value);
