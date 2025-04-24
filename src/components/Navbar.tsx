@@ -1,16 +1,17 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, User, LogOut, Settings, CloudRain, Home, ShoppingCart, Package, Warehouse } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useAuth } from '@/hooks/use-auth';
 
 interface NavbarProps {
   isLoggedIn: boolean;
   onLogout: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onLogout }) => {
+const Navbar: React.FC<NavbarProps> = () => {
+  const { isLoggedIn, logout } = useAuth();
   const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -62,7 +63,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onLogout }) => {
                         </Link>
                         <button 
                           onClick={() => {
-                            onLogout();
+                            logout();
                             toggleMenu();
                           }}
                           className="flex items-center text-gray-700 hover:text-farmlink-primary"
@@ -117,7 +118,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onLogout }) => {
                         Profile
                       </Button>
                     </Link>
-                    <Button onClick={onLogout} variant="ghost" className="flex items-center text-gray-700">
+                    <Button onClick={logout} variant="ghost" className="flex items-center text-gray-700">
                       <LogOut size={18} className="mr-2" />
                       Logout
                     </Button>
