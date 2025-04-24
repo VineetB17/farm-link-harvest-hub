@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import ProduceCard, { Produce } from '@/components/ProduceCard';
-import { Search, Filter, ShoppingCart } from 'lucide-react';
+import { Search, Filter, ShoppingCart, Trash2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
 
 const categories = [
   "All Categories",
@@ -20,6 +22,7 @@ const Marketplace: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchMarketplaceItems();
@@ -57,6 +60,30 @@ const Marketplace: React.FC = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('marketplace_products')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Item removed from marketplace",
+      });
+
+      fetchMarketplaceItems();
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to remove item',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -114,7 +141,12 @@ const Marketplace: React.FC = () => {
           {filteredItems.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredItems.map((item) => (
-                <MarketplaceCard key={item.id} produce={item} />
+                <MarketplaceCard 
+                  key={item.id} 
+                  produce={item} 
+                  isOwner={user?.id === item.user_id}
+                  onDelete={handleDelete}
+                />
               ))}
             </div>
           ) : (
@@ -129,10 +161,12 @@ const Marketplace: React.FC = () => {
 };
 
 interface MarketplaceCardProps {
-  produce: Produce & { price?: number };
+  produce: Produce & { price?: number; user_id?: string };
+  isOwner: boolean;
+  onDelete: (id: string) => void;
 }
 
-const MarketplaceCard: React.FC<MarketplaceCardProps> = ({ produce }) => {
+const MarketplaceCard: React.FC<MarketplaceCardProps> = ({ produce, isOwner, onDelete }) => {
   return (
     <div className="p-4 bg-white rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition-all">
       {produce.image_url && (
@@ -175,12 +209,24 @@ const MarketplaceCard: React.FC<MarketplaceCardProps> = ({ produce }) => {
         <div className="text-sm text-gray-600">
           Expires: {produce.expiryDate.toLocaleDateString()}
         </div>
-        <button 
-          className="flex items-center p-2 bg-farmlink-primary text-white rounded-md hover:bg-farmlink-secondary transition-colors"
-        >
-          <ShoppingCart size={16} className="mr-1" />
-          <span>Purchase</span>
-        </button>
+        {isOwner ? (
+          <Button 
+            variant="destructive" 
+            size="sm"
+            onClick={() => onDelete(produce.id)}
+          >
+            <Trash2 size={16} className="mr-1" />
+            Remove
+          </Button>
+        ) : (
+          <Button 
+            variant="default"
+            size="sm"
+          >
+            <ShoppingCart size={16} className="mr-1" />
+            Purchase
+          </Button>
+        )}
       </div>
     </div>
   );
