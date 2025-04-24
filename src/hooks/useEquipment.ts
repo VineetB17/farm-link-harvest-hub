@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Equipment, BorrowRequest } from '@/types/equipment';
+import { Equipment } from '@/types/equipment';
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -11,14 +11,12 @@ export const useEquipment = () => {
   const [myBorrowings, setMyBorrowings] = useState<Equipment[]>([]);
   const [requestedItems, setRequestedItems] = useState<Equipment[]>([]);
   const [myListedItems, setMyListedItems] = useState<Equipment[]>([]);
-  const [borrowRequests, setBorrowRequests] = useState<BorrowRequest[]>([]);
   const { toast } = useToast();
   const { user } = useAuth();
 
   useEffect(() => {
     if (user) {
       fetchEquipment();
-      fetchBorrowRequests();
       setupRealtimeUpdates();
     }
   }, [user]);
@@ -76,27 +74,6 @@ export const useEquipment = () => {
     }
   };
 
-  const fetchBorrowRequests = async () => {
-    if (!user) return;
-    
-    try {
-      const { data, error } = await supabase
-        .from('borrow_requests')
-        .select('*')
-        .eq('owner_id', user.id)
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      
-      // Fix: Break the circular reference using type assertion
-      if (data) {
-        setBorrowRequests(data as unknown as BorrowRequest[]);
-      }
-    } catch (error: any) {
-      console.error('Error fetching borrow requests:', error);
-    }
-  };
-
   const setupRealtimeUpdates = () => {
     const channel = supabase
       .channel('equipment-changes')
@@ -105,14 +82,6 @@ export const useEquipment = () => {
         (payload) => {
           console.log('Change received!', payload);
           fetchEquipment(); // Refresh data when changes occur
-        }
-      )
-      .on('postgres_changes',
-        { event: '*', schema: 'public', table: 'borrow_requests' },
-        (payload) => {
-          console.log('Borrow request change received!', payload);
-          fetchBorrowRequests(); // Refresh borrow requests
-          fetchEquipment(); // Also refresh equipment as status may have changed
         }
       )
       .subscribe();
@@ -164,11 +133,9 @@ export const useEquipment = () => {
           equipment_id: selectedEquipment.id,
           borrower_id: user.id,
           borrower_name: user.name || user.email,
-          owner_id: selectedEquipment.owner_id, // Add owner_id to make queries easier
           start_date: request.startDate,
           end_date: request.endDate,
           message: request.message,
-          status: 'pending'
         }])
         .select()
         .single();
@@ -252,94 +219,15 @@ export const useEquipment = () => {
     }
   };
 
-  // Accept a borrow request
-  const handleAcceptRequest = async (request: BorrowRequest) => {
-    try {
-      // Update the request status
-      const { error: requestError } = await supabase
-        .from('borrow_requests')
-        .update({ status: 'accepted' })
-        .eq('id', request.id);
-      
-      if (requestError) throw requestError;
-      
-      // Update the equipment status
-      const { error: equipmentError } = await supabase
-        .from('equipment_listings')
-        .update({ 
-          status: 'borrowed',
-          available: false 
-        })
-        .eq('id', request.equipment_id);
-      
-      if (equipmentError) throw equipmentError;
-      
-      toast({
-        title: "Request Accepted",
-        description: "You've approved the borrow request"
-      });
-      
-      fetchBorrowRequests();
-      fetchEquipment();
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to accept request",
-        variant: "destructive"
-      });
-    }
-  };
-  
-  // Decline a borrow request
-  const handleDeclineRequest = async (request: BorrowRequest) => {
-    try {
-      // Update the request status
-      const { error: requestError } = await supabase
-        .from('borrow_requests')
-        .update({ status: 'declined' })
-        .eq('id', request.id);
-      
-      if (requestError) throw requestError;
-      
-      // Update the equipment status back to available
-      const { error: equipmentError } = await supabase
-        .from('equipment_listings')
-        .update({ 
-          status: 'available',
-          available: true 
-        })
-        .eq('id', request.equipment_id);
-      
-      if (equipmentError) throw equipmentError;
-      
-      toast({
-        title: "Request Declined",
-        description: "You've declined the borrow request"
-      });
-      
-      fetchBorrowRequests();
-      fetchEquipment();
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to decline request",
-        variant: "destructive"
-      });
-    }
-  };
-
   return {
     equipment,
     loading,
     myBorrowings,
     requestedItems,
     myListedItems,
-    borrowRequests,
     handleAddEquipment,
     handleBorrowRequest,
     handleReturnEquipment,
-    handleDeleteListing,
-    handleAcceptRequest,
-    handleDeclineRequest
+    handleDeleteListing
   };
 };

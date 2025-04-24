@@ -1,17 +1,14 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { PlusCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { Equipment, BorrowRequest, LendingMessage } from '@/types/equipment';
-import { useToast } from "@/hooks/use-toast";
+import { Equipment } from '@/types/equipment';
 import AddLendingItemForm from '@/components/lending/AddLendingItemForm';
 import BorrowRequestForm from '@/components/lending/BorrowRequestForm';
 import CategoryFilter from '@/components/lending/CategoryFilter';
 import LendingTabs from '@/components/lending/LendingTabs';
-import MessagingDialog from '@/components/lending/MessagingDialog';
 import { useEquipment } from '@/hooks/useEquipment';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
 
 const categories = [
   "All Categories",
@@ -29,10 +26,6 @@ const Lending: React.FC = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showBorrowForm, setShowBorrowForm] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
-  const [showMessageDialog, setShowMessageDialog] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<BorrowRequest | null>(null);
-  const [messages, setMessages] = useState<LendingMessage[]>([]);
-  const { toast } = useToast();
   const { user } = useAuth();
 
   const {
@@ -41,95 +34,11 @@ const Lending: React.FC = () => {
     myBorrowings,
     requestedItems,
     myListedItems,
-    borrowRequests,
     handleAddEquipment,
     handleBorrowRequest,
     handleReturnEquipment,
-    handleDeleteListing,
-    handleAcceptRequest,
-    handleDeclineRequest
+    handleDeleteListing
   } = useEquipment();
-
-  useEffect(() => {
-    if (selectedRequest) {
-      fetchMessages(selectedRequest.id);
-      
-      // Set up real-time subscription for messages
-      const channel = supabase
-        .channel('lending-messages')
-        .on('postgres_changes', 
-          { event: 'INSERT', schema: 'public', table: 'lending_messages', filter: `request_id=eq.${selectedRequest.id}` },
-          (payload) => {
-            // Add the new message to the list
-            const newMessage = payload.new as LendingMessage;
-            setMessages(prev => [...prev, newMessage]);
-          }
-        )
-        .subscribe();
-        
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }
-  }, [selectedRequest]);
-
-  const fetchMessages = async (requestId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('lending_messages')
-        .select('*')
-        .eq('request_id', requestId)
-        .order('created_at', { ascending: true });
-        
-      if (error) throw error;
-      setMessages(data || []);
-    } catch (error) {
-      console.error('Error fetching messages:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load messages",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleSendMessage = async (message: string) => {
-    if (!user || !selectedRequest) return;
-    
-    try {
-      const { data, error } = await supabase
-        .from('lending_messages')
-        .insert([{
-          request_id: selectedRequest.id,
-          sender_id: user.id,
-          sender_name: user.name || user.email,
-          message: message
-        }])
-        .select();
-        
-      if (error) throw error;
-      
-      // The message will be added via the real-time subscription
-    } catch (error) {
-      console.error('Error sending message:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send message",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleMessageRequest = (request: BorrowRequest) => {
-    setSelectedRequest(request);
-    setShowMessageDialog(true);
-  };
-
-  const handleCloseMessageDialog = () => {
-    setShowMessageDialog(false);
-    setSelectedRequest(null);
-    setMessages([]);
-  };
 
   const handleBorrowClick = (equipment: Equipment) => {
     // Prevent borrowing own equipment
@@ -207,24 +116,10 @@ const Lending: React.FC = () => {
         myBorrowings={myBorrowings}
         requestedItems={requestedItems}
         myListedItems={myListedItems}
-        borrowRequests={borrowRequests}
         onBorrowClick={handleBorrowClick}
         onReturnEquipment={handleReturnEquipment}
         onDeleteListing={handleDeleteListing}
-        onMessageRequest={handleMessageRequest}
-        onAcceptRequest={handleAcceptRequest}
-        onDeclineRequest={handleDeclineRequest}
       />
-
-      {showMessageDialog && selectedRequest && (
-        <MessagingDialog 
-          isOpen={showMessageDialog}
-          onClose={handleCloseMessageDialog}
-          borrowRequest={selectedRequest}
-          onSendMessage={handleSendMessage}
-          messages={messages}
-        />
-      )}
     </div>
   );
 };
