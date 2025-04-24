@@ -53,7 +53,7 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment, onBorrow }) =>
       
       <div className="space-y-2 mb-4">
         <div className="flex items-center text-sm">
-          <User size={14} className="mr-2 text-gray-500" />
+          <UserIcon size={14} className="mr-2 text-gray-500" />
           <span className="text-gray-700">{equipment.owner}</span>
         </div>
         <div className="flex items-center text-sm">
