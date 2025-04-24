@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { PlusCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -34,10 +33,13 @@ const Lending: React.FC = () => {
     myBorrowings,
     requestedItems,
     myListedItems,
+    incomingRequests,
     handleAddEquipment,
     handleBorrowRequest,
     handleReturnEquipment,
-    handleDeleteListing
+    handleDeleteListing,
+    handleAcceptRequest,
+    handleDeclineRequest
   } = useEquipment();
 
   const handleBorrowClick = (equipment: Equipment) => {
@@ -116,9 +118,12 @@ const Lending: React.FC = () => {
         myBorrowings={myBorrowings}
         requestedItems={requestedItems}
         myListedItems={myListedItems}
+        incomingRequests={incomingRequests}
         onBorrowClick={handleBorrowClick}
         onReturnEquipment={handleReturnEquipment}
         onDeleteListing={handleDeleteListing}
+        onAcceptRequest={handleAcceptRequest}
+        onDeclineRequest={handleDeclineRequest}
       />
     </div>
   );

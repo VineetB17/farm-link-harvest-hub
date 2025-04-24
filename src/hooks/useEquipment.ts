@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { Equipment } from '@/types/equipment';
+import { Equipment, BorrowRequest } from '@/types/equipment';
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -11,12 +10,14 @@ export const useEquipment = () => {
   const [myBorrowings, setMyBorrowings] = useState<Equipment[]>([]);
   const [requestedItems, setRequestedItems] = useState<Equipment[]>([]);
   const [myListedItems, setMyListedItems] = useState<Equipment[]>([]);
+  const [incomingRequests, setIncomingRequests] = useState<BorrowRequest[]>([]);
   const { toast } = useToast();
   const { user } = useAuth();
 
   useEffect(() => {
     if (user) {
       fetchEquipment();
+      fetchIncomingRequests();
       setupRealtimeUpdates();
     }
   }, [user]);
@@ -71,6 +72,37 @@ export const useEquipment = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchIncomingRequests = async () => {
+    if (!user) return;
+
+    try {
+      const { data: myListings } = await supabase
+        .from('equipment_listings')
+        .select('id')
+        .eq('owner_id', user.id);
+
+      if (myListings && myListings.length > 0) {
+        const listingIds = myListings.map(listing => listing.id);
+        
+        const { data: requests } = await supabase
+          .from('borrow_requests')
+          .select('*, equipment_listings(*)')
+          .in('equipment_id', listingIds)
+          .eq('status', 'pending');
+
+        if (requests) {
+          setIncomingRequests(requests);
+        }
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch incoming requests",
+        variant: "destructive"
+      });
     }
   };
 
@@ -219,6 +251,85 @@ export const useEquipment = () => {
     }
   };
 
+  const handleAcceptRequest = async (requestId: string) => {
+    if (!user) return;
+
+    try {
+      // Update borrow request status to accepted
+      const { data: updatedRequest, error: requestError } = await supabase
+        .from('borrow_requests')
+        .update({ 
+          status: 'accepted', 
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', requestId)
+        .select()
+        .single();
+
+      if (requestError) throw requestError;
+
+      // Update equipment status to borrowed
+      const { error: equipmentError } = await supabase
+        .from('equipment_listings')
+        .update({ 
+          status: 'borrowed', 
+          available: false 
+        })
+        .eq('id', updatedRequest.equipment_id);
+
+      if (equipmentError) throw equipmentError;
+
+      toast({
+        title: "Request Accepted",
+        description: "You've accepted the borrow request"
+      });
+
+      // Refresh data
+      fetchEquipment();
+      fetchIncomingRequests();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to accept request",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDeclineRequest = async (requestId: string) => {
+    if (!user) return;
+
+    try {
+      // Update borrow request status to declined
+      const { data: updatedRequest, error: requestError } = await supabase
+        .from('borrow_requests')
+        .update({ 
+          status: 'declined', 
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', requestId)
+        .select()
+        .single();
+
+      if (requestError) throw requestError;
+
+      toast({
+        title: "Request Declined",
+        description: "You've declined the borrow request"
+      });
+
+      // Refresh data
+      fetchEquipment();
+      fetchIncomingRequests();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to decline request",
+        variant: "destructive"
+      });
+    }
+  };
+
   return {
     equipment,
     loading,
@@ -228,6 +339,9 @@ export const useEquipment = () => {
     handleAddEquipment,
     handleBorrowRequest,
     handleReturnEquipment,
-    handleDeleteListing
+    handleDeleteListing,
+    incomingRequests,
+    handleAcceptRequest,
+    handleDeclineRequest
   };
 };
