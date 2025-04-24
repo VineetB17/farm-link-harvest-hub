@@ -1,6 +1,7 @@
+
 import React, { useEffect, useState } from 'react';
 import ProduceCard, { Produce } from '@/components/ProduceCard';
-import { Search, Filter, ShoppingCart, Trash2, HandShake } from 'lucide-react';
+import { Search, Filter, ShoppingCart, Trash2, Handshake } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -182,6 +183,7 @@ const Marketplace: React.FC = () => {
                   produce={item} 
                   isOwner={user?.id === item.user_id}
                   onDelete={handleDelete}
+                  onMakeOffer={handleMakeOffer}
                 />
               ))}
             </div>
@@ -200,9 +202,10 @@ interface MarketplaceCardProps {
   produce: Produce & { price?: number; user_id?: string };
   isOwner: boolean;
   onDelete: (id: string) => void;
+  onMakeOffer: (produce: Produce) => void;
 }
 
-const MarketplaceCard: React.FC<MarketplaceCardProps> = ({ produce, isOwner, onDelete }) => {
+const MarketplaceCard: React.FC<MarketplaceCardProps> = ({ produce, isOwner, onDelete, onMakeOffer }) => {
   console.log('Item ownership check:', { 
     isOwner, 
     produceUserId: produce.user_id, 
@@ -264,9 +267,9 @@ const MarketplaceCard: React.FC<MarketplaceCardProps> = ({ produce, isOwner, onD
           <Button 
             variant="default"
             size="sm"
-            onClick={() => handleMakeOffer(produce)}
+            onClick={() => onMakeOffer(produce)}
           >
-            <HandShake size={16} className="mr-1" />
+            <Handshake size={16} className="mr-1" />
             Make Offer
           </Button>
         )}
