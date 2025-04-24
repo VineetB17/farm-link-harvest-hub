@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Filter, PlusCircle } from 'lucide-react';
-import { Card, CardContent } from "@/components/ui/card";
+import { PlusCircle } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import EquipmentCard, { Equipment } from '@/components/EquipmentCard';
+import { Equipment } from '@/components/EquipmentCard';
 import AddLendingItemForm from '@/components/lending/AddLendingItemForm';
 import BorrowRequestForm from '@/components/lending/BorrowRequestForm';
-import { nanoid } from 'nanoid';
-import { Tag } from 'lucide-react';
+import CategoryFilter from '@/components/lending/CategoryFilter';
+import EquipmentList from '@/components/lending/EquipmentList';
+import BorrowedEquipmentList from '@/components/lending/BorrowedEquipmentList';
 
 const categories = [
   "All Categories",
@@ -149,21 +149,6 @@ const Lending: React.FC = () => {
     setShowBorrowForm(true);
   };
 
-  const handleBorrowEquipment = (id: string) => {
-    setEquipment(prev => prev.map(item => {
-      if (item.id === id) {
-        const borrowedItem = { ...item, available: false };
-        setMyBorrowings(prev => [...prev, borrowedItem]);
-        toast({
-          title: "Equipment Borrowed",
-          description: `You have successfully requested to borrow ${item.name}`,
-        });
-        return borrowedItem;
-      }
-      return item;
-    }));
-  };
-
   const handleReturnEquipment = (id: string) => {
     setMyBorrowings(prev => prev.filter(item => item.id !== id));
     setEquipment(prev => prev.map(item => {
@@ -195,36 +180,13 @@ const Lending: React.FC = () => {
     <div className="farmlink-container py-10">
       <h1 className="text-2xl md:text-3xl font-bold mb-6 text-farmlink-secondary">Equipment Lending</h1>
       
-      <div className="bg-white rounded-lg shadow-md p-4 mb-8">
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search size={18} className="text-gray-400" />
-          </div>
-          <input
-            type="text"
-            className="form-input pl-10 w-full"
-            placeholder="Search by equipment name, owner or location..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        
-        <div className="mt-4 flex flex-wrap gap-2">
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              className={`px-3 py-1 text-sm rounded-full ${
-                selectedCategory === category 
-                  ? 'bg-farmlink-primary text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-      </div>
+      <CategoryFilter
+        categories={categories}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+      />
       
       <div className="flex justify-end mb-6">
         <Button 
@@ -266,86 +228,26 @@ const Lending: React.FC = () => {
         </TabsList>
 
         <TabsContent value="available" className="mt-6">
-          {loading ? (
-            <div className="text-center py-12">
-              <p>Loading equipment listings...</p>
-            </div>
-          ) : (
-            <>
-              {availableItems.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
-                  {availableItems.map((item) => (
-                    <EquipmentCard 
-                      key={item.id} 
-                      equipment={item}
-                      onBorrow={() => handleBorrowClick(item)}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 border border-dashed border-gray-300 rounded-lg">
-                  <p className="text-gray-500">No equipment available matching your search criteria.</p>
-                </div>
-              )}
-            </>
-          )}
+          <EquipmentList 
+            items={availableItems} 
+            isLoading={loading}
+            onBorrowClick={handleBorrowClick}
+          />
         </TabsContent>
 
         <TabsContent value="unavailable" className="mt-6">
-          {loading ? (
-            <div className="text-center py-12">
-              <p>Loading equipment listings...</p>
-            </div>
-          ) : (
-            <>
-              {unavailableItems.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
-                  {unavailableItems.map((item) => (
-                    <EquipmentCard key={item.id} equipment={item} />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 border border-dashed border-gray-300 rounded-lg">
-                  <p className="text-gray-500">No borrowed equipment matching your search criteria.</p>
-                </div>
-              )}
-            </>
-          )}
+          <EquipmentList 
+            items={unavailableItems} 
+            isLoading={loading}
+            emptyMessage="No borrowed equipment matching your search criteria."
+          />
         </TabsContent>
         
         <TabsContent value="myborrowing" className="mt-6">
-          {myBorrowings.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {myBorrowings.map((item) => (
-                <Card key={item.id} className="overflow-hidden">
-                  <div className="h-40 bg-farmlink-light flex items-center justify-center">
-                    <Tag size={48} className="text-farmlink-accent opacity-20" />
-                  </div>
-                  <CardContent className="p-4">
-                    <div className="flex items-center mb-2">
-                      <Tag size={16} className="text-farmlink-accent mr-2" />
-                      <span className="text-sm text-farmlink-accent">{item.category}</span>
-                    </div>
-                    <h3 className="font-semibold text-lg mb-1">{item.name}</h3>
-                    <p className="text-sm text-gray-600 mb-3">Borrowed from: {item.owner}</p>
-                    
-                    <button 
-                      onClick={() => handleReturnEquipment(item.id)}
-                      className="w-full py-2 rounded-md text-center bg-farmlink-primary text-white hover:bg-farmlink-primary/90 flex items-center justify-center"
-                    >
-                      <Tag size={16} className="mr-2" />
-                      Return Equipment
-                    </button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 border border-dashed border-gray-300 rounded-lg">
-              <p className="text-gray-500">You haven't borrowed any equipment yet.</p>
-              <p className="text-gray-500 mt-2">Browse the available equipment and request to borrow.</p>
-            </div>
-          )}
+          <BorrowedEquipmentList 
+            items={myBorrowings}
+            onReturn={handleReturnEquipment}
+          />
         </TabsContent>
       </Tabs>
     </div>
