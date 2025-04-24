@@ -1,3 +1,4 @@
+
 export interface Equipment {
   id: string;
   name: string;
@@ -22,6 +23,7 @@ export interface BorrowRequest {
   equipment_id: string;
   borrower_id: string;
   borrower_name: string;
+  owner_id: string;
   start_date: string;
   end_date: string;
   message?: string;
