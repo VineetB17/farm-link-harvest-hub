@@ -101,6 +101,51 @@ export type Database = {
         }
         Relationships: []
       }
+      inventory_items: {
+        Row: {
+          category: string
+          created_at: string
+          expiry_date: string
+          farm_name: string
+          harvest_date: string
+          id: string
+          location: string
+          name: string
+          quantity: number
+          unit: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          expiry_date: string
+          farm_name: string
+          harvest_date: string
+          id?: string
+          location: string
+          name: string
+          quantity: number
+          unit: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          expiry_date?: string
+          farm_name?: string
+          harvest_date?: string
+          id?: string
+          location?: string
+          name?: string
+          quantity?: number
+          unit?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       lending_messages: {
         Row: {
           created_at: string

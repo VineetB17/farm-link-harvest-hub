@@ -3,9 +3,9 @@ import ProduceCard, { Produce } from '@/components/ProduceCard';
 import InventoryForm from '@/components/InventoryForm';
 import AddProductForm from '@/components/marketplace/AddProductForm';
 import { Plus, Minus, Filter, Trash2 } from 'lucide-react';
-import { nanoid } from 'nanoid';
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useInventory } from '@/hooks/useInventory';
 
 const categories = [
   "All Categories",
@@ -21,80 +21,39 @@ const Inventory: React.FC = () => {
   const { toast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
-  const [inventory, setInventory] = useState<Produce[]>([
-    {
-      id: '1',
-      name: 'Tomatoes',
-      quantity: 15,
-      unit: 'kg',
-      harvestDate: new Date('2025-04-01'),
-      expiryDate: new Date('2025-04-15'),
-      farmName: 'Green Valley Farm',
-      location: 'Mumbai, Maharashtra',
-      category: 'Vegetables'
-    },
-    {
-      id: '2',
-      name: 'Lettuce',
-      quantity: 8,
-      unit: 'boxes',
-      harvestDate: new Date('2025-04-02'),
-      expiryDate: new Date('2025-04-08'),
-      farmName: 'Green Valley Farm',
-      location: 'Delhi, Delhi',
-      category: 'Vegetables'
-    },
-    {
-      id: '3',
-      name: 'Carrots',
-      quantity: 25,
-      unit: 'kg',
-      harvestDate: new Date('2025-04-01'),
-      expiryDate: new Date('2025-04-30'),
-      farmName: 'Green Valley Farm',
-      location: 'Bangalore, Karnataka',
-      category: 'Vegetables'
-    },
-    {
-      id: '4',
-      name: 'Apples',
-      quantity: 40,
-      unit: 'kg',
-      harvestDate: new Date('2025-04-01'),
-      expiryDate: new Date('2025-04-25'),
-      farmName: 'Green Valley Farm',
-      location: 'Shimla, Himachal Pradesh',
-      category: 'Fruits'
-    },
-    {
-      id: '5',
-      name: 'Wheat',
-      quantity: 100,
-      unit: 'kg',
-      harvestDate: new Date('2025-03-25'),
-      expiryDate: new Date('2025-06-25'),
-      farmName: 'Green Valley Farm',
-      location: 'Ludhiana, Punjab',
-      category: 'Grains'
-    }
-  ]);
+  const { inventory, isLoading, addItem, deleteItem } = useInventory();
 
-  const handleAddProduce = (produce: Omit<Produce, 'id'>) => {
-    const newProduce = {
-      ...produce,
-      id: nanoid()
-    };
-    
-    setInventory([newProduce, ...inventory]);
-    setShowForm(false);
+  const handleAddProduce = async (produce: Omit<Produce, 'id'>) => {
+    try {
+      await addItem.mutateAsync(produce);
+      setShowForm(false);
+      toast({
+        title: "Success",
+        description: "Item added to inventory successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add item",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleRemoveProduce = (id: string) => {
-    setInventory(prev => prev.filter(item => item.id !== id));
-    toast({
-      title: "Item Removed",
-      description: "The item has been removed from your inventory",
-    });
+  const handleRemoveProduce = async (id: string) => {
+    try {
+      await deleteItem.mutateAsync(id);
+      toast({
+        title: "Success",
+        description: "Item removed from inventory",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to remove item",
+        variant: "destructive",
+      });
+    }
   };
 
   const filteredInventory = inventory.filter(item => 
