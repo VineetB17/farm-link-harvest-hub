@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { Input } from '@/components/ui/input';
@@ -7,14 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
-interface Message {
-  id: string;
-  sender_id: string;
-  receiver_id: string;
-  message: string;
-  created_at: string;
-}
+import { useChat } from '@/hooks/useChat';
 
 interface ChatUser {
   id: string;
@@ -25,45 +18,17 @@ interface ChatUser {
 const Chat = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [selectedUser, setSelectedUser] = useState<ChatUser | null>(null);
   const [users, setUsers] = useState<ChatUser[]>([]);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    fetchUsers();
-    const channel = supabase
-      .channel('chat-updates')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'chats',
-          filter: `receiver_id=eq.${user?.id}`,
-        },
-        (payload) => {
-          const newMessage = payload.new as Message;
-          setMessages((prev) => [...prev, newMessage]);
-          scrollToBottom();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user?.id]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const { messages, sendMessage } = useChat(selectedUser?.id || null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const fetchUsers = async () => {
     if (!user) return;
     
+    setLoading(true);
     const { data, error } = await supabase
       .from('profiles')
       .select('id, name, farm_name')
@@ -79,51 +44,23 @@ const Chat = () => {
     }
 
     setUsers(data);
-  };
-
-  const fetchMessages = async (receiverId: string) => {
-    if (!user) return;
-    
-    const { data, error } = await supabase
-      .from('chats')
-      .select('*')
-      .or(`and(sender_id.eq.${user.id},receiver_id.eq.${receiverId}),and(sender_id.eq.${receiverId},receiver_id.eq.${user.id})`)
-      .order('created_at', { ascending: true });
-
-    if (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to load messages',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    setMessages(data);
-    setTimeout(scrollToBottom, 100);
-  };
-
-  const sendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || !selectedUser || !newMessage.trim()) return;
-
-    setLoading(true);
-    const { error } = await supabase.from('chats').insert({
-      sender_id: user.id,
-      receiver_id: selectedUser.id,
-      message: newMessage.trim(),
-    });
-
-    if (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to send message',
-        variant: 'destructive',
-      });
-    } else {
-      setNewMessage('');
-    }
     setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, [user?.id]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !selectedUser) return;
+
+    await sendMessage(newMessage);
+    setNewMessage('');
   };
 
   return (
@@ -137,10 +74,7 @@ const Chat = () => {
             {users.map((u) => (
               <button
                 key={u.id}
-                onClick={() => {
-                  setSelectedUser(u);
-                  fetchMessages(u.id);
-                }}
+                onClick={() => setSelectedUser(u)}
                 className={`w-full text-left p-3 rounded-md mb-2 hover:bg-gray-100 ${
                   selectedUser?.id === u.id ? 'bg-gray-100' : ''
                 }`}
@@ -201,15 +135,15 @@ const Chat = () => {
               </ScrollArea>
 
               {/* Message input */}
-              <form onSubmit={sendMessage} className="p-4 border-t">
+              <form onSubmit={handleSubmit} className="p-4 border-t">
                 <div className="flex gap-2">
                   <Input
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="Type a message..."
-                    disabled={loading}
+                    className="flex-1"
                   />
-                  <Button type="submit" disabled={loading || !newMessage.trim()}>
+                  <Button type="submit" disabled={!newMessage.trim()}>
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>
