@@ -8,5 +8,5 @@ export interface Equipment {
   available: boolean;
   description: string;
   status?: 'available' | 'borrowed' | 'requested' | 'pending';
+  listedById?: string; // ID of the user who listed this equipment
 }
-

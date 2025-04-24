@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { MapPin, User, Tag } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface Equipment {
   id: string;
@@ -11,6 +12,7 @@ export interface Equipment {
   available: boolean;
   description: string;
   status?: 'available' | 'borrowed' | 'requested' | 'pending';
+  listedById?: string;
 }
 
 interface EquipmentCardProps {
@@ -19,8 +21,12 @@ interface EquipmentCardProps {
 }
 
 const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment, onBorrow }) => {
+  const { user } = useAuth();
+  
+  const isOwnEquipment = user && (equipment.listedById === user.id || equipment.owner === user.name);
+  
   const handleBorrowClick = () => {
-    if (equipment.available && onBorrow) {
+    if (equipment.available && !isOwnEquipment && onBorrow) {
       onBorrow(equipment);
     }
   };
@@ -57,14 +63,21 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment, onBorrow }) =>
       
       <button 
         className={`w-full py-2 rounded-md text-center transition-colors ${
-          equipment.available 
+          equipment.available && !isOwnEquipment
             ? 'bg-farmlink-primary text-white hover:bg-farmlink-primary/90' 
+            : isOwnEquipment
+            ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
             : 'bg-gray-100 text-gray-500 cursor-not-allowed'
         }`}
         onClick={handleBorrowClick}
-        disabled={!equipment.available}
+        disabled={!equipment.available || isOwnEquipment}
       >
-        {equipment.available ? 'Request to Borrow' : 'Currently Unavailable'}
+        {equipment.available 
+          ? isOwnEquipment 
+            ? 'Your Own Equipment' 
+            : 'Request to Borrow'
+          : 'Currently Unavailable'
+        }
       </button>
     </div>
   );

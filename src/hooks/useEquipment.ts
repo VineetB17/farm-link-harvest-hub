@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Equipment } from '@/types/equipment';
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from '@/contexts/AuthContext';
 
 export const useEquipment = () => {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [loading, setLoading] = useState(true);
   const [myBorrowings, setMyBorrowings] = useState<Equipment[]>([]);
   const [requestedItems, setRequestedItems] = useState<Equipment[]>([]);
+  const [myListedItems, setMyListedItems] = useState<Equipment[]>([]);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   useEffect(() => {
     const loadSampleData = async () => {
@@ -22,7 +25,8 @@ export const useEquipment = () => {
           location: 'Amritsar, Punjab',
           available: true,
           description: 'Medium-sized tractor suitable for most field operations.',
-          status: 'available'
+          status: 'available',
+          listedById: 'other-user-1'
         },
         {
           id: '102',
@@ -32,7 +36,8 @@ export const useEquipment = () => {
           location: 'Coimbatore, Tamil Nadu',
           available: true,
           description: 'Complete drip irrigation system for up to 2 acres.',
-          status: 'available'
+          status: 'available',
+          listedById: 'other-user-2'
         },
         {
           id: '103',
@@ -42,7 +47,8 @@ export const useEquipment = () => {
           location: 'Lucknow, Uttar Pradesh',
           available: false,
           description: 'Large combine harvester suitable for grain crops.',
-          status: 'borrowed'
+          status: 'borrowed',
+          listedById: 'other-user-3'
         },
         {
           id: '104',
@@ -108,17 +114,30 @@ export const useEquipment = () => {
       
       setEquipment(sampleData);
       setLoading(false);
+      
+      if (user) {
+        setMyListedItems(sampleData.filter(item => 
+          item.listedById === user.id || item.owner === user.name
+        ));
+      }
     };
     
     loadSampleData();
-  }, []);
+  }, [user]);
 
   const handleAddEquipment = (newItem: Equipment) => {
-    setEquipment(prev => [{
+    if (!user) return;
+    
+    const listedItem = {
       ...newItem,
       status: 'available' as const,
-      available: true
-    }, ...prev]);
+      available: true,
+      listedById: user.id,
+      owner: user.name || user.email.split('@')[0]
+    };
+    
+    setEquipment(prev => [listedItem, ...prev]);
+    setMyListedItems(prev => [listedItem, ...prev]);
     
     toast({
       title: "Equipment Added",
@@ -127,6 +146,17 @@ export const useEquipment = () => {
   };
 
   const handleBorrowRequest = (request: any, selectedEquipment: Equipment | null) => {
+    if (!selectedEquipment || !user) return;
+    
+    if (selectedEquipment.listedById === user.id || selectedEquipment.owner === user.name) {
+      toast({
+        title: "Cannot Borrow Own Equipment",
+        description: "You cannot borrow equipment that you've listed",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     const updatedEquipment = equipment.map(item => {
       if (item.id === request.equipmentId) {
         return { ...item, status: 'requested' as const, available: false };
@@ -136,13 +166,11 @@ export const useEquipment = () => {
     
     setEquipment(updatedEquipment);
     
-    if (selectedEquipment) {
-      setRequestedItems(prev => [...prev, { 
-        ...selectedEquipment, 
-        status: 'requested' as const,
-        available: false 
-      }]);
-    }
+    setRequestedItems(prev => [...prev, { 
+      ...selectedEquipment, 
+      status: 'requested' as const,
+      available: false 
+    }]);
     
     toast({
       title: "Request Sent",
@@ -163,14 +191,26 @@ export const useEquipment = () => {
       return item;
     }));
   };
+  
+  const handleDeleteListing = (id: string) => {
+    setEquipment(prev => prev.filter(item => item.id !== id));
+    setMyListedItems(prev => prev.filter(item => item.id !== id));
+    
+    toast({
+      title: "Listing Removed",
+      description: "Your equipment listing has been removed",
+    });
+  };
 
   return {
     equipment,
     loading,
     myBorrowings,
     requestedItems,
+    myListedItems,
     handleAddEquipment,
     handleBorrowRequest,
-    handleReturnEquipment
+    handleReturnEquipment,
+    handleDeleteListing
   };
 };
