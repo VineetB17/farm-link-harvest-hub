@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import ImageUpload from "@/components/ui/image-upload";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const categories = [
   "Fruits",
@@ -27,6 +28,8 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onSuccess }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [productImage, setProductImage] = useState<File | null>(null);
+  const [isImageOptional, setIsImageOptional] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -56,7 +59,18 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onSuccess }) => {
       return;
     }
 
+    if (!productImage && !isImageOptional) {
+      toast({
+        title: "Missing Image",
+        description: "Please upload a product image or check 'No image available'",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
+    setIsSubmitting(true);
+    
     try {
       let imageUrl = null;
       
@@ -109,6 +123,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onSuccess }) => {
       });
     } finally {
       setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -240,9 +255,27 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onSuccess }) => {
       <div>
         <Label>Product Image</Label>
         <ImageUpload onImageSelect={handleImageSelect} />
+        
+        <div className="flex items-center space-x-2 mt-2">
+          <Checkbox
+            id="isImageOptional"
+            checked={isImageOptional} 
+            onCheckedChange={(checked) => setIsImageOptional(checked === true)}
+          />
+          <label
+            htmlFor="isImageOptional"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            No image available
+          </label>
+        </div>
       </div>
 
-      <Button type="submit" disabled={loading} className="w-full">
+      <Button 
+        type="submit" 
+        disabled={loading || isSubmitting} 
+        className="w-full"
+      >
         {loading ? "Adding Product..." : "Add Product"}
       </Button>
     </form>
