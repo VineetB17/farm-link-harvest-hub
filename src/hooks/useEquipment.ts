@@ -88,7 +88,11 @@ export const useEquipment = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      setBorrowRequests(data || []);
+      
+      // Ensure each item in data has all required properties for BorrowRequest
+      if (data) {
+        setBorrowRequests(data as BorrowRequest[]);
+      }
     } catch (error: any) {
       console.error('Error fetching borrow requests:', error);
     }

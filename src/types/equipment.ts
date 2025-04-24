@@ -26,7 +26,7 @@ export interface BorrowRequest {
   owner_id: string;
   start_date: string;
   end_date: string;
-  message?: string;
+  message?: string | null;
   status: string;
   created_at: string;
   updated_at: string;
