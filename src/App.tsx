@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -35,11 +36,9 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 // Main Layout component with auth-aware navbar
 const Layout = ({ children }: { children: React.ReactNode }) => {
-  const { isLoggedIn, logout } = useAuth();
-  
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar isLoggedIn={isLoggedIn} onLogout={logout} />
+      <Navbar />
       <main className="flex-grow">
         {children}
       </main>
