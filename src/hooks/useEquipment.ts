@@ -1,7 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { Equipment } from '@/types/equipment';
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 
 export const useEquipment = () => {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
@@ -13,193 +15,195 @@ export const useEquipment = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    const loadSampleData = async () => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const sampleData: Equipment[] = [
-        {
-          id: '101',
-          name: 'John Deere Tractor',
-          category: 'Tractors',
-          owner: 'Singh Farms',
-          location: 'Amritsar, Punjab',
-          available: true,
-          description: 'Medium-sized tractor suitable for most field operations.',
-          status: 'available',
-          listedById: 'other-user-1'
-        },
-        {
-          id: '102',
-          name: 'Irrigation System',
-          category: 'Irrigation',
-          owner: 'Green Valley Farms',
-          location: 'Coimbatore, Tamil Nadu',
-          available: true,
-          description: 'Complete drip irrigation system for up to 2 acres.',
-          status: 'available',
-          listedById: 'other-user-2'
-        },
-        {
-          id: '103',
-          name: 'Harvest Combine',
-          category: 'Harvesters',
-          owner: 'Kumar Agro',
-          location: 'Lucknow, Uttar Pradesh',
-          available: false,
-          description: 'Large combine harvester suitable for grain crops.',
-          status: 'borrowed',
-          listedById: 'other-user-3'
-        },
-        {
-          id: '104',
-          name: 'Seedling Planter',
-          category: 'Seeders',
-          owner: 'Patel Organics',
-          location: 'Ahmedabad, Gujarat',
-          available: true,
-          description: 'Automated seedling planter with adjustable row spacing.',
-          status: 'available'
-        },
-        {
-          id: '105',
-          name: 'Apple Sorting Machine',
-          category: 'Processing',
-          owner: 'Himachal Growers',
-          location: 'Shimla, Himachal Pradesh',
-          available: true,
-          description: 'Automated fruit sorting system for medium-sized operations.',
-          status: 'available'
-        },
-        {
-          id: '106',
-          name: 'Hand Tools Bundle',
-          category: 'Tools',
-          owner: 'Kerala Farms',
-          location: 'Trivandrum, Kerala',
-          available: true,
-          description: 'Complete set of pruning and harvesting hand tools.',
-          status: 'available'
-        },
-        {
-          id: '107',
-          name: 'Rotary Tiller',
-          category: 'Tools',
-          owner: 'Sharma Agriculture',
-          location: 'Jaipur, Rajasthan',
-          available: true,
-          description: 'Heavy-duty tiller for preparing soil before planting.',
-          status: 'available'
-        },
-        {
-          id: '108',
-          name: 'Rice Transplanter',
-          category: 'Seeders',
-          owner: 'Bengal Agro',
-          location: 'Kolkata, West Bengal',
-          available: true,
-          description: 'Mechanical rice transplanter for efficient paddy planting.',
-          status: 'available'
-        },
-        {
-          id: '109',
-          name: 'Sprinkler System',
-          category: 'Irrigation',
-          owner: 'Maharashtra Farms',
-          location: 'Nagpur, Maharashtra',
-          available: true,
-          description: 'Medium-range sprinkler system for 3-4 acre coverage.',
-          status: 'available'
-        }
-      ];
-      
-      setEquipment(sampleData);
-      setLoading(false);
-      
-      if (user) {
-        setMyListedItems(sampleData.filter(item => 
-          item.listedById === user.id || item.owner === user.name
-        ));
-      }
-    };
-    
-    loadSampleData();
+    if (user) {
+      fetchEquipment();
+      setupRealtimeUpdates();
+    }
   }, [user]);
 
-  const handleAddEquipment = (newItem: Equipment) => {
+  const fetchEquipment = async () => {
+    try {
+      setLoading(true);
+      const { data: equipmentData, error: equipmentError } = await supabase
+        .from('equipment_listings')
+        .select('*')
+        .eq('available', true);
+
+      if (equipmentError) throw equipmentError;
+      setEquipment(equipmentData || []);
+
+      if (user) {
+        // Fetch my listed items
+        const { data: myListings } = await supabase
+          .from('equipment_listings')
+          .select('*')
+          .eq('owner_id', user.id);
+        setMyListedItems(myListings || []);
+
+        // Fetch my requested items
+        const { data: myRequests } = await supabase
+          .from('borrow_requests')
+          .select('*, equipment_listings(*)')
+          .eq('borrower_id', user.id);
+
+        if (myRequests) {
+          setRequestedItems(myRequests.map(request => request.equipment_listings));
+        }
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to fetch equipment",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const setupRealtimeUpdates = () => {
+    const channel = supabase
+      .channel('equipment-changes')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'equipment_listings' },
+        (payload) => {
+          console.log('Change received!', payload);
+          fetchEquipment(); // Refresh data when changes occur
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  };
+
+  const handleAddEquipment = async (newItem: Omit<Equipment, 'id' | 'owner_id' | 'owner_name'>) => {
     if (!user) return;
     
-    const listedItem = {
-      ...newItem,
-      status: 'available' as const,
-      available: true,
-      listedById: user.id,
-      owner: user.name || user.email.split('@')[0]
-    };
-    
-    setEquipment(prev => [listedItem, ...prev]);
-    setMyListedItems(prev => [listedItem, ...prev]);
-    
-    toast({
-      title: "Equipment Added",
-      description: "Your equipment has been listed for lending"
-    });
-  };
+    try {
+      const { data, error } = await supabase
+        .from('equipment_listings')
+        .insert([{
+          ...newItem,
+          owner_id: user.id,
+          owner_name: user.user_metadata.name || user.email,
+        }])
+        .select()
+        .single();
 
-  const handleBorrowRequest = (request: any, selectedEquipment: Equipment | null) => {
-    if (!selectedEquipment || !user) return;
-    
-    if (selectedEquipment.listedById === user.id || selectedEquipment.owner === user.name) {
+      if (error) throw error;
+
       toast({
-        title: "Cannot Borrow Own Equipment",
-        description: "You cannot borrow equipment that you've listed",
+        title: "Equipment Added",
+        description: "Your equipment has been listed for lending"
+      });
+      
+      return data;
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add equipment",
         variant: "destructive"
       });
-      return;
     }
-    
-    const updatedEquipment = equipment.map(item => {
-      if (item.id === request.equipmentId) {
-        return { ...item, status: 'requested' as const, available: false };
-      }
-      return item;
-    });
-    
-    setEquipment(updatedEquipment);
-    
-    setRequestedItems(prev => [...prev, { 
-      ...selectedEquipment, 
-      status: 'requested' as const,
-      available: false 
-    }]);
-    
-    toast({
-      title: "Request Sent",
-      description: "Your borrow request has been sent"
-    });
   };
 
-  const handleReturnEquipment = (id: string) => {
-    setMyBorrowings(prev => prev.filter(item => item.id !== id));
-    setEquipment(prev => prev.map(item => {
-      if (item.id === id) {
-        toast({
-          title: "Equipment Returned",
-          description: `You have successfully returned ${item.name}`,
-        });
-        return { ...item, available: true, status: 'available' as const };
-      }
-      return item;
-    }));
-  };
-  
-  const handleDeleteListing = (id: string) => {
-    setEquipment(prev => prev.filter(item => item.id !== id));
-    setMyListedItems(prev => prev.filter(item => item.id !== id));
+  const handleBorrowRequest = async (request: any, selectedEquipment: Equipment | null) => {
+    if (!selectedEquipment || !user) return;
     
-    toast({
-      title: "Listing Removed",
-      description: "Your equipment listing has been removed",
-    });
+    try {
+      // Create borrow request
+      const { data: borrowRequest, error: borrowError } = await supabase
+        .from('borrow_requests')
+        .insert([{
+          equipment_id: selectedEquipment.id,
+          borrower_id: user.id,
+          borrower_name: user.user_metadata.name || user.email,
+          start_date: request.startDate,
+          end_date: request.endDate,
+          message: request.message,
+        }])
+        .select()
+        .single();
+
+      if (borrowError) throw borrowError;
+
+      // Update equipment status
+      const { error: updateError } = await supabase
+        .from('equipment_listings')
+        .update({ 
+          status: 'requested',
+          available: false 
+        })
+        .eq('id', selectedEquipment.id);
+
+      if (updateError) throw updateError;
+      
+      toast({
+        title: "Request Sent",
+        description: "Your borrow request has been sent to the owner"
+      });
+
+      fetchEquipment(); // Refresh the listings
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to submit borrow request",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleReturnEquipment = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('equipment_listings')
+        .update({ 
+          status: 'available',
+          available: true 
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Equipment Returned",
+        description: "The equipment has been marked as returned"
+      });
+
+      fetchEquipment();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to return equipment",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDeleteListing = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('equipment_listings')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Listing Removed",
+        description: "Your equipment listing has been removed",
+      });
+
+      fetchEquipment();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete listing",
+        variant: "destructive"
+      });
+    }
   };
 
   return {

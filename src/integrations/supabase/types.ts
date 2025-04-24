@@ -9,6 +9,130 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      borrow_requests: {
+        Row: {
+          borrower_id: string
+          borrower_name: string
+          created_at: string
+          end_date: string
+          equipment_id: string
+          id: string
+          message: string | null
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          borrower_id: string
+          borrower_name: string
+          created_at?: string
+          end_date: string
+          equipment_id: string
+          id?: string
+          message?: string | null
+          start_date: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          borrower_id?: string
+          borrower_name?: string
+          created_at?: string
+          end_date?: string
+          equipment_id?: string
+          id?: string
+          message?: string | null
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "borrow_requests_equipment_id_fkey"
+            columns: ["equipment_id"]
+            isOneToOne: false
+            referencedRelation: "equipment_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      equipment_listings: {
+        Row: {
+          available: boolean
+          category: string
+          created_at: string
+          description: string
+          id: string
+          location: string
+          name: string
+          owner_id: string
+          owner_name: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          available?: boolean
+          category: string
+          created_at?: string
+          description: string
+          id?: string
+          location: string
+          name: string
+          owner_id: string
+          owner_name: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          available?: boolean
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          location?: string
+          name?: string
+          owner_id?: string
+          owner_name?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      lending_messages: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          request_id: string
+          sender_id: string
+          sender_name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          request_id: string
+          sender_id: string
+          sender_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          request_id?: string
+          sender_id?: string
+          sender_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lending_messages_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "borrow_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string

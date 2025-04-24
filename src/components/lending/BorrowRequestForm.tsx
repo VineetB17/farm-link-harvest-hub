@@ -4,21 +4,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
+import { Equipment } from '@/types/equipment';
 
 interface BorrowRequestFormProps {
-  equipment: {
-    id: string;
-    name: string;
-    owner: string;
-  };
-  onSubmit: (request: any) => void;
+  equipment: Equipment;
+  onSubmit: (request: {
+    equipmentId: string;
+    startDate: string;
+    endDate: string;
+    message?: string;
+  }) => void;
   onClose: () => void;
 }
 
 const BorrowRequestForm: React.FC<BorrowRequestFormProps> = ({ equipment, onSubmit, onClose }) => {
-  const { toast } = useToast();
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
@@ -26,19 +25,12 @@ const BorrowRequestForm: React.FC<BorrowRequestFormProps> = ({ equipment, onSubm
     
     const request = {
       equipmentId: equipment.id,
-      equipmentName: equipment.name,
-      owner: equipment.owner,
-      startDate: formData.get('startDate'),
-      endDate: formData.get('endDate'),
-      message: formData.get('message'),
-      status: 'pending'
+      startDate: formData.get('startDate') as string,
+      endDate: formData.get('endDate') as string,
+      message: formData.get('message') as string,
     };
     
     onSubmit(request);
-    toast({
-      title: "Request Sent",
-      description: "Your borrow request has been sent to the owner",
-    });
     form.reset();
     onClose();
   };
@@ -60,7 +52,11 @@ const BorrowRequestForm: React.FC<BorrowRequestFormProps> = ({ equipment, onSubm
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Message to Owner</label>
-            <Textarea name="message" placeholder="Explain your need for the equipment..." required />
+            <Textarea 
+              name="message" 
+              placeholder="Explain your need for the equipment..." 
+              required 
+            />
           </div>
           <div className="flex gap-2">
             <Button type="submit">Send Request</Button>

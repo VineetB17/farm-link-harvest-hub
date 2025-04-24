@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
+import { Equipment } from '@/types/equipment';
 
 interface AddLendingItemFormProps {
-  onSubmit: (item: any) => void;
+  onSubmit: (item: Partial<Equipment>) => void;
   onClose: () => void;
 }
 
@@ -20,19 +21,15 @@ const AddLendingItemForm: React.FC<AddLendingItemFormProps> = ({ onSubmit, onClo
     const formData = new FormData(form);
     
     const newItem = {
-      id: Date.now().toString(),
-      name: formData.get('name'),
-      category: formData.get('category'),
-      description: formData.get('description'),
-      location: formData.get('location'),
-      available: true
+      name: formData.get('name') as string,
+      category: formData.get('category') as string,
+      description: formData.get('description') as string,
+      location: formData.get('location') as string,
+      available: true,
+      status: 'available' as const
     };
     
     onSubmit(newItem);
-    toast({
-      title: "Equipment Added",
-      description: "Your equipment has been listed for lending",
-    });
     form.reset();
     onClose();
   };
