@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { PlusCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,6 @@ import CategoryFilter from '@/components/lending/CategoryFilter';
 import LendingTabs from '@/components/lending/LendingTabs';
 import { useEquipment } from '@/hooks/useEquipment';
 import { useAuth } from '@/contexts/AuthContext';
-import { User } from '@/types/user';
 
 const categories = [
   "All Categories",
@@ -41,6 +41,7 @@ const Lending: React.FC = () => {
   } = useEquipment();
 
   const handleBorrowClick = (equipment: Equipment) => {
+    // Prevent borrowing own equipment
     if (user && (equipment.listedById === user.id || equipment.owner === user.name)) {
       return;
     }
@@ -55,6 +56,7 @@ const Lending: React.FC = () => {
                          
     const matchesCategory = selectedCategory === 'All Categories' || item.category === selectedCategory;
     
+    // Filter out items listed by the current user from the available tab
     const isNotOwnItem = !(user && (item.listedById === user.id || item.owner === user.name));
     
     return matchesSearch && matchesCategory && isNotOwnItem;

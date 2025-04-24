@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { MapPin, User as UserIcon, Tag } from 'lucide-react';
+import { MapPin, User, Tag } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { User } from '@/types/user'; // Import our extended User type
 
 export interface Equipment {
   id: string;
@@ -53,7 +52,7 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment, onBorrow }) =>
       
       <div className="space-y-2 mb-4">
         <div className="flex items-center text-sm">
-          <UserIcon size={14} className="mr-2 text-gray-500" />
+          <User size={14} className="mr-2 text-gray-500" />
           <span className="text-gray-700">{equipment.owner}</span>
         </div>
         <div className="flex items-center text-sm">
