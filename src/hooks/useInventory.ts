@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -32,9 +31,32 @@ export const useInventory = () => {
     enabled: !!user
   });
 
+  const uploadImage = async (file: File) => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { error: uploadError, data } = await supabase.storage
+      .from('inventory-images')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('inventory-images')
+      .getPublicUrl(filePath);
+
+    return publicUrl;
+  };
+
   const addItem = useMutation({
-    mutationFn: async (produce: Omit<Produce, 'id'>) => {
+    mutationFn: async (produce: Omit<Produce, 'id'> & { image?: File }) => {
       if (!user) throw new Error('User must be logged in');
+      
+      let imageUrl = null;
+      if (produce.image) {
+        imageUrl = await uploadImage(produce.image);
+      }
       
       const { data, error } = await supabase
         .from('inventory_items')
@@ -47,7 +69,8 @@ export const useInventory = () => {
           expiry_date: produce.expiryDate.toISOString(),
           farm_name: produce.farmName,
           location: produce.location,
-          category: produce.category
+          category: produce.category,
+          image_url: imageUrl
         })
         .select()
         .single();

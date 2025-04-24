@@ -2,18 +2,10 @@ import React, { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { Produce } from './ProduceCard';
-
-const categories = [
-  "Fruits",
-  "Vegetables", 
-  "Grains",
-  "Dairy",
-  "Nuts",
-  "Other"
-];
+import ImageUpload from './ui/image-upload';
 
 interface InventoryFormProps {
-  onAddProduce: (produce: Omit<Produce, 'id'>) => void;
+  onAddProduce: (produce: Omit<Produce, 'id'> & { image?: File }) => void;
 }
 
 const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
@@ -25,6 +17,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
   const [farmName, setFarmName] = useState('');
   const [location, setLocation] = useState('');
   const [category, setCategory] = useState('');
+  const [image, setImage] = useState<File | undefined>();
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -47,7 +40,8 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
       expiryDate: new Date(expiryDate),
       farmName,
       location,
-      category
+      category,
+      image
     };
 
     onAddProduce(newProduce);
@@ -59,6 +53,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
     setHarvestDate('');
     setExpiryDate('');
     setCategory('');
+    setImage(undefined);
     
     toast({
       title: 'Success',
@@ -72,6 +67,14 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
       
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Product Image</label>
+            <ImageUpload 
+              onImageSelect={(file) => setImage(file)}
+              previewUrl={image ? URL.createObjectURL(image) : undefined}
+            />
+          </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">Produce Name</label>
             <input

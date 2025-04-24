@@ -13,6 +13,7 @@ export interface Produce {
   farmName: string;
   location: string;
   category?: string;
+  image_url?: string;
 }
 
 interface ProduceCardProps {
@@ -26,6 +27,16 @@ const ProduceCard: React.FC<ProduceCardProps> = ({ produce }) => {
   
   return (
     <div className="p-4 bg-white rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition-all">
+      {produce.image_url && (
+        <div className="aspect-video mb-3 rounded-md overflow-hidden">
+          <img 
+            src={produce.image_url} 
+            alt={produce.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+
       <div className="flex justify-between items-start mb-3">
         <div>
           <h3 className="font-semibold text-lg text-farmlink-secondary">{produce.name}</h3>

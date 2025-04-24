@@ -109,6 +109,7 @@ export type Database = {
           farm_name: string
           harvest_date: string
           id: string
+          image_url: string | null
           location: string
           name: string
           quantity: number
@@ -123,6 +124,7 @@ export type Database = {
           farm_name: string
           harvest_date: string
           id?: string
+          image_url?: string | null
           location: string
           name: string
           quantity: number
@@ -137,6 +139,7 @@ export type Database = {
           farm_name?: string
           harvest_date?: string
           id?: string
+          image_url?: string | null
           location?: string
           name?: string
           quantity?: number
