@@ -136,6 +136,60 @@ export type Database = {
           },
         ]
       }
+      marketplace_products: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          expiry_date: string
+          farm_name: string
+          harvest_date: string
+          id: string
+          image_url: string | null
+          location: string
+          name: string
+          price: number
+          quantity: number
+          unit: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          expiry_date: string
+          farm_name: string
+          harvest_date: string
+          id?: string
+          image_url?: string | null
+          location: string
+          name: string
+          price: number
+          quantity: number
+          unit: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          expiry_date?: string
+          farm_name?: string
+          harvest_date?: string
+          id?: string
+          image_url?: string | null
+          location?: string
+          name?: string
+          price?: number
+          quantity?: number
+          unit?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
