@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Equipment } from '@/components/EquipmentCard';
+import { Equipment } from '@/types/equipment';  // Change import to types/equipment
 import { Card, CardContent } from "@/components/ui/card";
 import { Tag } from 'lucide-react';
 
