@@ -1,7 +1,6 @@
-
 import React, { useEffect, useState } from 'react';
 import ProduceCard, { Produce } from '@/components/ProduceCard';
-import { Search, Filter, ShoppingCart, Trash2 } from 'lucide-react';
+import { Search, Filter, ShoppingCart, Trash2, HandShake } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -89,6 +88,41 @@ const Marketplace: React.FC = () => {
     }
   };
 
+  const handleMakeOffer = async (produce: Produce) => {
+    if (!user) {
+      toast({
+        title: 'Error',
+        description: 'Please login to make an offer',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('marketplace_offers')
+        .insert({
+          product_id: produce.id,
+          user_id: user.id,
+          offer_amount: produce.price,
+          message: `Initial offer for ${produce.name}`
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Your offer has been sent to the seller",
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to make offer',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const filteredItems = marketItems.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          item.farmName.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -169,7 +203,6 @@ interface MarketplaceCardProps {
 }
 
 const MarketplaceCard: React.FC<MarketplaceCardProps> = ({ produce, isOwner, onDelete }) => {
-  // Add console log to help debug ownership issue
   console.log('Item ownership check:', { 
     isOwner, 
     produceUserId: produce.user_id, 
@@ -231,9 +264,10 @@ const MarketplaceCard: React.FC<MarketplaceCardProps> = ({ produce, isOwner, onD
           <Button 
             variant="default"
             size="sm"
+            onClick={() => handleMakeOffer(produce)}
           >
-            <ShoppingCart size={16} className="mr-1" />
-            Purchase
+            <HandShake size={16} className="mr-1" />
+            Make Offer
           </Button>
         )}
       </div>
