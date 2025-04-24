@@ -29,6 +29,7 @@ export const useChat = (selectedUserId: string | null) => {
       .order('created_at', { ascending: true });
 
     if (error) {
+      console.error("Error fetching messages:", error);
       toast({
         title: "Error",
         description: "Failed to load messages",
@@ -54,6 +55,7 @@ export const useChat = (selectedUserId: string | null) => {
       .insert([newMessage]);
 
     if (error) {
+      console.error("Error sending message:", error);
       toast({
         title: "Error",
         description: "Failed to send message",

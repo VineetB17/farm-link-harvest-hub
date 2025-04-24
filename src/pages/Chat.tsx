@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Send } from 'lucide-react';
+import { Send, MessageSquare, UserRound } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useChat } from '@/hooks/useChat';
@@ -21,7 +21,7 @@ const Chat = () => {
   const [newMessage, setNewMessage] = useState('');
   const [selectedUser, setSelectedUser] = useState<ChatUser | null>(null);
   const [users, setUsers] = useState<ChatUser[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { messages, sendMessage } = useChat(selectedUser?.id || null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -29,26 +29,43 @@ const Chat = () => {
     if (!user) return;
     
     setLoading(true);
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('id, name, farm_name')
-      .neq('id', user.id);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, name, farm_name')
+        .neq('id', user.id);
 
-    if (error) {
+      if (error) {
+        console.error("Error fetching users:", error);
+        throw error;
+      }
+
+      console.log("Fetched users:", data);
+      
+      if (data && data.length > 0) {
+        setUsers(data.map(profile => ({
+          id: profile.id,
+          name: profile.name || 'Unnamed Farmer',
+          farmName: profile.farm_name
+        })));
+      } else {
+        console.log("No users found or returned");
+      }
+    } catch (error: any) {
       toast({
-        title: 'Error',
-        description: 'Failed to load users',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to load users: " + (error.message || "Unknown error"),
+        variant: "destructive",
       });
-      return;
+    } finally {
+      setLoading(false);
     }
-
-    setUsers(data);
-    setLoading(false);
   };
 
   useEffect(() => {
-    fetchUsers();
+    if (user?.id) {
+      fetchUsers();
+    }
   }, [user?.id]);
 
   useEffect(() => {
@@ -69,23 +86,34 @@ const Chat = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* Users list */}
         <div className="md:col-span-1 bg-white p-4 rounded-lg shadow">
-          <h2 className="font-semibold mb-4">Farmers</h2>
-          <ScrollArea className="h-[500px]">
-            {users.map((u) => (
-              <button
-                key={u.id}
-                onClick={() => setSelectedUser(u)}
-                className={`w-full text-left p-3 rounded-md mb-2 hover:bg-gray-100 ${
-                  selectedUser?.id === u.id ? 'bg-gray-100' : ''
-                }`}
-              >
-                <div className="font-medium">{u.name || 'Unnamed Farmer'}</div>
-                {u.farmName && (
-                  <div className="text-sm text-gray-500">{u.farmName}</div>
-                )}
-              </button>
-            ))}
-          </ScrollArea>
+          <h2 className="font-semibold mb-4 flex items-center gap-2">
+            <UserRound size={18} />
+            Farmers
+          </h2>
+          {loading ? (
+            <div className="p-4 text-center text-gray-500">Loading users...</div>
+          ) : users.length > 0 ? (
+            <ScrollArea className="h-[500px]">
+              {users.map((u) => (
+                <button
+                  key={u.id}
+                  onClick={() => setSelectedUser(u)}
+                  className={`w-full text-left p-3 rounded-md mb-2 hover:bg-gray-100 ${
+                    selectedUser?.id === u.id ? 'bg-gray-100' : ''
+                  }`}
+                >
+                  <div className="font-medium">{u.name}</div>
+                  {u.farmName && (
+                    <div className="text-sm text-gray-500">{u.farmName}</div>
+                  )}
+                </button>
+              ))}
+            </ScrollArea>
+          ) : (
+            <div className="p-4 text-center text-gray-500">
+              No other farmers found. Invite some friends to join!
+            </div>
+          )}
         </div>
 
         {/* Chat area */}
@@ -107,29 +135,39 @@ const Chat = () => {
               {/* Messages */}
               <ScrollArea className="flex-1 p-4">
                 <div className="space-y-4">
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${
-                        message.sender_id === user?.id
-                          ? 'justify-end'
-                          : 'justify-start'
-                      }`}
-                    >
+                  {messages.length > 0 ? (
+                    messages.map((message) => (
                       <div
-                        className={`max-w-[70%] p-3 rounded-lg ${
+                        key={message.id}
+                        className={`flex ${
                           message.sender_id === user?.id
-                            ? 'bg-farmlink-primary text-white'
-                            : 'bg-gray-100'
+                            ? 'justify-end'
+                            : 'justify-start'
                         }`}
                       >
-                        <p>{message.message}</p>
-                        <span className="text-xs opacity-75">
-                          {new Date(message.created_at).toLocaleTimeString()}
-                        </span>
+                        <div
+                          className={`max-w-[70%] p-3 rounded-lg ${
+                            message.sender_id === user?.id
+                              ? 'bg-farmlink-primary text-white'
+                              : 'bg-gray-100'
+                          }`}
+                        >
+                          <p>{message.message}</p>
+                          <span className="text-xs opacity-75">
+                            {new Date(message.created_at).toLocaleTimeString()}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex items-center justify-center h-60 text-gray-500">
+                      <div className="text-center">
+                        <MessageSquare className="mx-auto h-12 w-12 opacity-30" />
+                        <p className="mt-2">No messages yet</p>
+                        <p className="text-sm">Send a message to start the conversation</p>
                       </div>
                     </div>
-                  ))}
+                  )}
                   <div ref={messagesEndRef} />
                 </div>
               </ScrollArea>
@@ -151,7 +189,10 @@ const Chat = () => {
             </>
           ) : (
             <div className="flex items-center justify-center h-full text-gray-500">
-              Select a user to start chatting
+              <div className="text-center">
+                <MessageSquare className="mx-auto h-16 w-16 opacity-30" />
+                <p className="mt-4">Select a user to start chatting</p>
+              </div>
             </div>
           )}
         </div>
