@@ -146,20 +146,28 @@ const Marketplace: React.FC = () => {
     }
   };
 
-  const handleAcceptOffer = async (offerId: string) => {
+  const handleAcceptOffer = async (offerId: string, productId: string) => {
     try {
-      const { error } = await supabase
+      const { error: offerError } = await supabase
         .from('marketplace_offers')
         .update({ status: 'accepted' })
         .eq('id', offerId);
 
-      if (error) throw error;
+      if (offerError) throw offerError;
+
+      const { error: productError } = await supabase
+        .from('marketplace_products')
+        .delete()
+        .eq('id', productId);
+
+      if (productError) throw productError;
 
       toast({
         title: 'Success',
-        description: 'Offer accepted',
+        description: 'Offer accepted and item removed from marketplace',
       });
 
+      fetchMarketplaceItems();
       fetchMarketplaceOffers();
     } catch (error: any) {
       toast({
@@ -225,7 +233,7 @@ const Marketplace: React.FC = () => {
                   <Button 
                     variant="default" 
                     size="sm"
-                    onClick={() => handleAcceptOffer(offer.id)}
+                    onClick={() => handleAcceptOffer(offer.id, offer.product_id)}
                   >
                     Accept
                   </Button>
