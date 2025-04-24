@@ -4,28 +4,36 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from '@/components/ui/input';
+import { useAuth } from '@/contexts/AuthContext';
 
-interface SignupProps {
-  onSignup: (name: string, email: string, password: string, farmName?: string, location?: string) => void;
-}
-
-const Signup: React.FC<SignupProps> = ({ onSignup }) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [farmName, setFarmName] = useState('');
-  const [location, setLocation] = useState('');
-  const [phone, setPhone] = useState('');
-  const [loading, setLoading] = useState(false);
+const Signup = () => {
   const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    farmName: '',
+    location: '',
+    phone: ''
+  });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { signup } = useAuth();
   const { toast } = useToast();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handleNextStep = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (password.length < 8) {
+    if (formData.password.length < 8) {
       toast({
         title: 'Password Too Short',
         description: 'Password must be at least 8 characters long',
@@ -34,7 +42,7 @@ const Signup: React.FC<SignupProps> = ({ onSignup }) => {
       return;
     }
     
-    if (password !== confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       toast({
         title: 'Passwords Do Not Match',
         description: 'Please make sure your passwords match',
@@ -51,20 +59,18 @@ const Signup: React.FC<SignupProps> = ({ onSignup }) => {
     setLoading(true);
     
     try {
-      // In a real app, we would call an API here
-      // For now, we'll just simulate a successful registration after a short delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      onSignup(name, email, password, farmName, location);
-      toast({
-        title: 'Registration Successful',
-        description: 'Welcome to FarmLink!',
-      });
+      await signup(
+        formData.name,
+        formData.email,
+        formData.password,
+        formData.farmName,
+        formData.location
+      );
       navigate('/inventory');
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Registration Failed',
-        description: 'There was an error creating your account',
+        description: error.message || 'There was an error creating your account',
         variant: 'destructive',
       });
     } finally {
@@ -94,9 +100,10 @@ const Signup: React.FC<SignupProps> = ({ onSignup }) => {
                   </label>
                   <Input
                     id="name"
+                    name="name"
                     type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={formData.name}
+                    onChange={handleChange}
                     placeholder="John Doe"
                     required
                   />
@@ -108,9 +115,10 @@ const Signup: React.FC<SignupProps> = ({ onSignup }) => {
                   </label>
                   <Input
                     id="email"
+                    name="email"
                     type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={formData.email}
+                    onChange={handleChange}
                     placeholder="you@example.com"
                     required
                   />
@@ -122,9 +130,10 @@ const Signup: React.FC<SignupProps> = ({ onSignup }) => {
                   </label>
                   <Input
                     id="password"
+                    name="password"
                     type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={formData.password}
+                    onChange={handleChange}
                     placeholder="••••••••"
                     minLength={8}
                     required
@@ -138,9 +147,10 @@ const Signup: React.FC<SignupProps> = ({ onSignup }) => {
                   </label>
                   <Input
                     id="confirmPassword"
+                    name="confirmPassword"
                     type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
                     placeholder="••••••••"
                     minLength={8}
                     required
@@ -164,9 +174,10 @@ const Signup: React.FC<SignupProps> = ({ onSignup }) => {
                   </label>
                   <Input
                     id="farmName"
+                    name="farmName"
                     type="text"
-                    value={farmName}
-                    onChange={(e) => setFarmName(e.target.value)}
+                    value={formData.farmName}
+                    onChange={handleChange}
                     placeholder="Green Acres Farm"
                     required
                   />
@@ -178,9 +189,10 @@ const Signup: React.FC<SignupProps> = ({ onSignup }) => {
                   </label>
                   <Input
                     id="location"
+                    name="location"
                     type="text"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
+                    value={formData.location}
+                    onChange={handleChange}
                     placeholder="Mumbai, Maharashtra"
                     required
                   />
@@ -192,9 +204,10 @@ const Signup: React.FC<SignupProps> = ({ onSignup }) => {
                   </label>
                   <Input
                     id="phone"
+                    name="phone"
                     type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    value={formData.phone}
+                    onChange={handleChange}
                     placeholder="+91 98765 43210"
                     required
                   />

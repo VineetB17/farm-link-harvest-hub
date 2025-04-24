@@ -5,16 +5,14 @@ import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from '@/components/ui/input';
 import { Mail, Lock, User } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
-interface LoginProps {
-  onLogin: (email: string, password: string) => void;
-}
-
-const Login: React.FC<LoginProps> = ({ onLogin }) => {
+const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -22,16 +20,12 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setLoading(true);
 
     try {
-      // In a real app, we would call an API here
-      // For now, we'll just simulate a successful login after a short delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      onLogin(email, password);
+      await login(email, password);
       navigate('/inventory');
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Login Failed',
-        description: 'Invalid email or password',
+        description: error.message || 'Invalid email or password',
         variant: 'destructive',
       });
     } finally {
