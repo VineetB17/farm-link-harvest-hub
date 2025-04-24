@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
 import ProduceCard, { Produce } from '@/components/ProduceCard';
 import InventoryForm from '@/components/InventoryForm';
-import { Plus, Minus, Filter } from 'lucide-react';
+import { Plus, Minus, Filter, Trash2 } from 'lucide-react';
 import { nanoid } from 'nanoid';
+import { useToast } from "@/components/ui/use-toast";
 
 const categories = [
   "All Categories",
@@ -15,6 +17,7 @@ const categories = [
 ];
 
 const Inventory: React.FC = () => {
+  const { toast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [inventory, setInventory] = useState<Produce[]>([
@@ -85,6 +88,14 @@ const Inventory: React.FC = () => {
     setShowForm(false);
   };
 
+  const handleRemoveProduce = (id: string) => {
+    setInventory(prev => prev.filter(item => item.id !== id));
+    toast({
+      title: "Item Removed",
+      description: "The item has been removed from your inventory",
+    });
+  };
+
   const filteredInventory = inventory.filter(item => 
     selectedCategory === 'All Categories' || item.category === selectedCategory
   );
@@ -141,7 +152,16 @@ const Inventory: React.FC = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredInventory.map((produce) => (
-          <ProduceCard key={produce.id} produce={produce} />
+          <div key={produce.id} className="relative">
+            <ProduceCard produce={produce} />
+            <button
+              onClick={() => handleRemoveProduce(produce.id)}
+              className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+              title="Remove item"
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
         ))}
       </div>
 

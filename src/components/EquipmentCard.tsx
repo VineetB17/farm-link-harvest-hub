@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { MapPin, User, Tag } from 'lucide-react';
 
@@ -10,6 +9,7 @@ export interface Equipment {
   location: string;
   available: boolean;
   description: string;
+  status?: 'available' | 'borrowed' | 'requested';
 }
 
 interface EquipmentCardProps {

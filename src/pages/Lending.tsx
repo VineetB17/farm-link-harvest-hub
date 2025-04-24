@@ -29,11 +29,10 @@ const Lending: React.FC = () => {
   const [showBorrowForm, setShowBorrowForm] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
   const [myBorrowings, setMyBorrowings] = useState<Equipment[]>([]);
+  const [requestedItems, setRequestedItems] = useState<Equipment[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
-    // In a real app, this would be an API call
-    // For now, let's simulate loading sample data
     const loadSampleData = async () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
@@ -129,19 +128,35 @@ const Lending: React.FC = () => {
   }, []);
 
   const handleAddEquipment = (newItem: Equipment) => {
-    setEquipment(prev => [newItem, ...prev]);
+    setEquipment(prev => [{
+      ...newItem,
+      status: 'available',
+      available: true
+    }, ...prev]);
     setShowAddForm(false);
+    toast({
+      title: "Equipment Added",
+      description: "Your equipment has been listed for lending"
+    });
   };
 
   const handleBorrowRequest = (request: any) => {
-    setEquipment(prev => prev.map(item => {
+    const updatedEquipment = equipment.map(item => {
       if (item.id === request.equipmentId) {
-        return { ...item, available: false };
+        return { ...item, status: 'requested', available: false };
       }
       return item;
-    }));
+    });
+    
+    setEquipment(updatedEquipment);
+    setRequestedItems(prev => [...prev, { ...selectedEquipment!, status: 'requested' }]);
     setShowBorrowForm(false);
     setSelectedEquipment(null);
+    
+    toast({
+      title: "Request Sent",
+      description: "Your borrow request has been sent"
+    });
   };
 
   const handleBorrowClick = (equipment: Equipment) => {
@@ -222,31 +237,31 @@ const Lending: React.FC = () => {
 
       <Tabs defaultValue="available">
         <TabsList>
-          <TabsTrigger value="available">Available ({availableItems.length})</TabsTrigger>
-          <TabsTrigger value="unavailable">Currently Borrowed ({unavailableItems.length})</TabsTrigger>
-          <TabsTrigger value="myborrowing">My Borrowings ({myBorrowings.length})</TabsTrigger>
+          <TabsTrigger value="available">Available ({equipment.filter(e => e.available).length})</TabsTrigger>
+          <TabsTrigger value="borrowed">Borrowed ({myBorrowings.length})</TabsTrigger>
+          <TabsTrigger value="requested">Requested ({requestedItems.length})</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="available" className="mt-6">
+        <TabsContent value="available">
           <EquipmentList 
-            items={availableItems} 
+            items={equipment.filter(e => e.available)} 
             isLoading={loading}
             onBorrowClick={handleBorrowClick}
           />
         </TabsContent>
 
-        <TabsContent value="unavailable" className="mt-6">
-          <EquipmentList 
-            items={unavailableItems} 
-            isLoading={loading}
-            emptyMessage="No borrowed equipment matching your search criteria."
-          />
-        </TabsContent>
-        
-        <TabsContent value="myborrowing" className="mt-6">
+        <TabsContent value="borrowed">
           <BorrowedEquipmentList 
             items={myBorrowings}
             onReturn={handleReturnEquipment}
+          />
+        </TabsContent>
+        
+        <TabsContent value="requested">
+          <EquipmentList 
+            items={requestedItems}
+            isLoading={false}
+            emptyMessage="You haven't requested any equipment yet."
           />
         </TabsContent>
       </Tabs>
