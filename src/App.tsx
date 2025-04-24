@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +16,7 @@ import Weather from "./pages/Weather";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import Lending from "./pages/Lending";
+import Chat from "./pages/Chat";
 
 // Components
 import Navbar from "./components/Navbar";
@@ -80,6 +80,12 @@ const AppContent = () => {
         <Route path="/lending" element={
           <ProtectedRoute>
             <Lending />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/chat" element={
+          <ProtectedRoute>
+            <Chat />
           </ProtectedRoute>
         } />
         
