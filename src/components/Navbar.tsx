@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Menu, X, User, LogOut, Settings, CloudRain, Home, ShoppingCart, Package, Warehouse } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface NavbarProps {
   isLoggedIn: boolean;
