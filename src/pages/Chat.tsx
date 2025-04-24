@@ -8,6 +8,7 @@ import { Send, MessageSquare, UserRound } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useChat } from '@/hooks/useChat';
+import UserSearchInput from '@/components/UserSearchInput';
 
 interface ChatUser {
   id: string;
@@ -20,53 +21,8 @@ const Chat = () => {
   const { toast } = useToast();
   const [newMessage, setNewMessage] = useState('');
   const [selectedUser, setSelectedUser] = useState<ChatUser | null>(null);
-  const [users, setUsers] = useState<ChatUser[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { messages, sendMessage } = useChat(selectedUser?.id || null);
+  const { messages, sendMessage, loading } = useChat(selectedUser?.id || null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const fetchUsers = async () => {
-    if (!user) return;
-    
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, name, farm_name')
-        .neq('id', user.id);
-
-      if (error) {
-        console.error("Error fetching users:", error);
-        throw error;
-      }
-
-      console.log("Fetched users:", data);
-      
-      if (data && data.length > 0) {
-        setUsers(data.map(profile => ({
-          id: profile.id,
-          name: profile.name || 'Unnamed Farmer',
-          farmName: profile.farm_name
-        })));
-      } else {
-        console.log("No users found or returned");
-      }
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Failed to load users: " + (error.message || "Unknown error"),
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (user?.id) {
-      fetchUsers();
-    }
-  }, [user?.id]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -80,38 +36,36 @@ const Chat = () => {
     setNewMessage('');
   };
 
+  if (!user) {
+    return (
+      <div className="farmlink-container py-8">
+        <div className="text-center">Please log in to use the chat feature.</div>
+      </div>
+    );
+  }
+
   return (
     <div className="farmlink-container py-8">
       <h1 className="text-2xl font-bold mb-6">Messages</h1>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* Users list */}
+        {/* Users search and list */}
         <div className="md:col-span-1 bg-white p-4 rounded-lg shadow">
           <h2 className="font-semibold mb-4 flex items-center gap-2">
             <UserRound size={18} />
-            Farmers
+            Search Users
           </h2>
-          {loading ? (
-            <div className="p-4 text-center text-gray-500">Loading users...</div>
-          ) : users.length > 0 ? (
-            <ScrollArea className="h-[500px]">
-              {users.map((u) => (
-                <button
-                  key={u.id}
-                  onClick={() => setSelectedUser(u)}
-                  className={`w-full text-left p-3 rounded-md mb-2 hover:bg-gray-100 ${
-                    selectedUser?.id === u.id ? 'bg-gray-100' : ''
-                  }`}
-                >
-                  <div className="font-medium">{u.name}</div>
-                  {u.farmName && (
-                    <div className="text-sm text-gray-500">{u.farmName}</div>
-                  )}
-                </button>
-              ))}
-            </ScrollArea>
-          ) : (
-            <div className="p-4 text-center text-gray-500">
-              No other farmers found. Invite some friends to join!
+          <UserSearchInput 
+            onSelectUser={setSelectedUser}
+            currentUserId={user.id}
+          />
+
+          {selectedUser && (
+            <div className="mt-4 p-2 bg-gray-50 rounded-md">
+              <div className="font-medium">Selected User:</div>
+              <div>{selectedUser.name}</div>
+              {selectedUser.farmName && (
+                <div className="text-sm text-gray-500">{selectedUser.farmName}</div>
+              )}
             </div>
           )}
         </div>
@@ -123,7 +77,7 @@ const Chat = () => {
               {/* Chat header */}
               <div className="p-4 border-b">
                 <h2 className="font-semibold">
-                  {selectedUser.name || 'Unnamed Farmer'}
+                  {selectedUser.name}
                   {selectedUser.farmName && (
                     <span className="text-sm text-gray-500 ml-2">
                       ({selectedUser.farmName})
@@ -135,19 +89,21 @@ const Chat = () => {
               {/* Messages */}
               <ScrollArea className="flex-1 p-4">
                 <div className="space-y-4">
-                  {messages.length > 0 ? (
+                  {loading ? (
+                    <div className="text-center text-gray-500">Loading messages...</div>
+                  ) : messages.length > 0 ? (
                     messages.map((message) => (
                       <div
                         key={message.id}
                         className={`flex ${
-                          message.sender_id === user?.id
+                          message.sender_id === user.id
                             ? 'justify-end'
                             : 'justify-start'
                         }`}
                       >
                         <div
                           className={`max-w-[70%] p-3 rounded-lg ${
-                            message.sender_id === user?.id
+                            message.sender_id === user.id
                               ? 'bg-farmlink-primary text-white'
                               : 'bg-gray-100'
                           }`}
@@ -191,7 +147,7 @@ const Chat = () => {
             <div className="flex items-center justify-center h-full text-gray-500">
               <div className="text-center">
                 <MessageSquare className="mx-auto h-16 w-16 opacity-30" />
-                <p className="mt-4">Select a user to start chatting</p>
+                <p className="mt-4">Search and select a user to start chatting</p>
               </div>
             </div>
           )}
