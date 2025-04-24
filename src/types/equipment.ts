@@ -1,3 +1,4 @@
+
 export interface Equipment {
   id: string;
   name: string;
@@ -28,6 +29,7 @@ export interface BorrowRequest {
   status: string;
   created_at: string;
   updated_at: string;
+  equipment_listings?: Equipment; // Add this to allow joining equipment data
 }
 
 export interface LendingMessage {
