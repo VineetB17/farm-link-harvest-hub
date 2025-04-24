@@ -255,13 +255,13 @@ const Inventory: React.FC = () => {
               
               <div>
                 <label htmlFor="price" className="block text-sm font-medium mb-1">
-                  Set Price ({selectedItem.unit})
+                  Set Price (₹/{selectedItem.unit})
                 </label>
                 <input
                   type="number"
                   id="price"
                   className="form-input w-full"
-                  placeholder="Enter price"
+                  placeholder="Enter price in ₹"
                   min="0"
                   step="0.01"
                   required

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import ProduceCard, { Produce } from '@/components/ProduceCard';
 import { Search, Filter, ShoppingCart } from 'lucide-react';
@@ -145,7 +144,7 @@ const MarketplaceCard: React.FC<MarketplaceCardProps> = ({ produce }) => {
           />
         </div>
       )}
-
+      
       <div className="flex justify-between items-start mb-3">
         <div>
           <h3 className="font-semibold text-lg text-farmlink-secondary">{produce.name}</h3>
@@ -157,7 +156,7 @@ const MarketplaceCard: React.FC<MarketplaceCardProps> = ({ produce }) => {
           </span>
           {produce.price && (
             <span className="text-green-600 font-bold mt-1">
-              ${produce.price.toFixed(2)}/{produce.unit}
+              ₹{produce.price.toFixed(2)}/{produce.unit}
             </span>
           )}
         </div>

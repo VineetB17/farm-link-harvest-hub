@@ -49,7 +49,7 @@ const ProduceCard: React.FC<ProduceCardProps> = ({ produce }) => {
           </span>
           {produce.price !== undefined && (
             <span className="text-green-600 font-bold mt-1">
-              ${produce.price.toFixed(2)}/{produce.unit}
+              ₹{produce.price.toFixed(2)}/{produce.unit}
             </span>
           )}
         </div>
