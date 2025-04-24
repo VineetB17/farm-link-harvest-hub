@@ -1,11 +1,15 @@
+
 import React, { useState } from 'react';
 import ProduceCard, { Produce } from '@/components/ProduceCard';
 import InventoryForm from '@/components/InventoryForm';
 import AddProductForm from '@/components/marketplace/AddProductForm';
-import { Plus, Minus, Filter, Trash2 } from 'lucide-react';
+import { Plus, Minus, Filter, Trash2, ShoppingCart } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useInventory } from '@/hooks/useInventory';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { supabase } from '@/lib/supabase';
 
 const categories = [
   "All Categories",
@@ -22,6 +26,8 @@ const Inventory: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const { inventory, isLoading, addItem, deleteItem } = useInventory();
+  const [selectedItem, setSelectedItem] = useState<Produce | null>(null);
+  const [isAddingToMarketplace, setIsAddingToMarketplace] = useState(false);
 
   const handleAddProduce = async (produce: Omit<Produce, 'id'>) => {
     try {
@@ -51,6 +57,57 @@ const Inventory: React.FC = () => {
       toast({
         title: "Error",
         description: error.message || "Failed to remove item",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAddToMarketplace = async (item: Produce, price: number) => {
+    if (!item) return;
+    
+    try {
+      const { user } = await supabase.auth.getUser();
+      if (!user?.id) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to add products to marketplace",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      const marketplaceItem = {
+        user_id: user.id,
+        name: item.name,
+        quantity: item.quantity,
+        unit: item.unit,
+        price: price,
+        harvest_date: item.harvestDate.toISOString().split('T')[0],
+        expiry_date: item.expiryDate.toISOString().split('T')[0],
+        farm_name: item.farmName,
+        location: item.location,
+        category: item.category,
+        description: `${item.name} from ${item.farmName}`,
+        image_url: item.image_url
+      };
+
+      const { error } = await supabase
+        .from('marketplace_products')
+        .insert(marketplaceItem);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Success",
+        description: "Item added to marketplace successfully",
+      });
+      
+      setIsAddingToMarketplace(false);
+      setSelectedItem(null);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add item to marketplace",
         variant: "destructive",
       });
     }
@@ -122,13 +179,25 @@ const Inventory: React.FC = () => {
               {filteredInventory.map((produce) => (
                 <div key={produce.id} className="relative">
                   <ProduceCard produce={produce} />
-                  <button
-                    onClick={() => handleRemoveProduce(produce.id)}
-                    className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                    aria-label="Remove item"
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                  <div className="absolute top-2 right-2 flex space-x-2">
+                    <button
+                      onClick={() => {
+                        setSelectedItem(produce);
+                        setIsAddingToMarketplace(true);
+                      }}
+                      className="p-2 bg-farmlink-primary text-white rounded-full hover:bg-farmlink-secondary transition-colors"
+                      aria-label="Add to marketplace"
+                    >
+                      <ShoppingCart size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleRemoveProduce(produce.id)}
+                      className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                      aria-label="Remove item"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -158,6 +227,91 @@ const Inventory: React.FC = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Add to Marketplace Dialog */}
+      <Dialog open={isAddingToMarketplace} onOpenChange={setIsAddingToMarketplace}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add to Marketplace</DialogTitle>
+          </DialogHeader>
+          
+          {selectedItem && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                {selectedItem.image_url && (
+                  <div className="w-16 h-16 rounded overflow-hidden">
+                    <img 
+                      src={selectedItem.image_url} 
+                      alt={selectedItem.name} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <div>
+                  <h3 className="font-medium">{selectedItem.name}</h3>
+                  <p className="text-sm text-gray-600">
+                    {selectedItem.quantity} {selectedItem.unit} from {selectedItem.farmName}
+                  </p>
+                </div>
+              </div>
+              
+              <div>
+                <label htmlFor="price" className="block text-sm font-medium mb-1">
+                  Set Price ({selectedItem.unit})
+                </label>
+                <input
+                  type="number"
+                  id="price"
+                  className="form-input w-full"
+                  placeholder="Enter price"
+                  min="0"
+                  step="0.01"
+                  required
+                  onKeyDown={(e) => {
+                    // Allow user to submit form with Enter key
+                    if (e.key === 'Enter') {
+                      const input = e.target as HTMLInputElement;
+                      const price = parseFloat(input.value);
+                      if (price > 0) {
+                        handleAddToMarketplace(selectedItem, price);
+                      }
+                    }
+                  }}
+                />
+              </div>
+              
+              <div className="flex justify-end space-x-3 pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setIsAddingToMarketplace(false);
+                    setSelectedItem(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={(e) => {
+                    const priceInput = document.getElementById('price') as HTMLInputElement;
+                    const price = parseFloat(priceInput.value);
+                    if (price > 0) {
+                      handleAddToMarketplace(selectedItem, price);
+                    } else {
+                      toast({
+                        title: "Error",
+                        description: "Please enter a valid price",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                >
+                  Add to Marketplace
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
