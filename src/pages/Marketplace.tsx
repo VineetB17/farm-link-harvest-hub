@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button';
 
 const categories = [
   "All Categories",
-  "Fruits",
-  "Vegetables", 
+  "Fruits", 
+  "Vegetables",
   "Grains",
   "Dairy",
   "Nuts",
@@ -21,11 +21,13 @@ const Marketplace: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [loading, setLoading] = useState(true);
+  const [offers, setOffers] = useState<any[]>([]);
   const { toast } = useToast();
   const { user } = useAuth();
 
   useEffect(() => {
     fetchMarketplaceItems();
+    fetchMarketplaceOffers();
   }, []);
 
   const fetchMarketplaceItems = async () => {
@@ -61,6 +63,27 @@ const Marketplace: React.FC = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchMarketplaceOffers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('marketplace_offers')
+        .select(`
+          *,
+          marketplace_products!inner(name, user_id)
+        `);
+
+      if (error) throw error;
+
+      setOffers(data || []);
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: 'Failed to load marketplace offers',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -123,6 +146,54 @@ const Marketplace: React.FC = () => {
     }
   };
 
+  const handleAcceptOffer = async (offerId: string) => {
+    try {
+      const { error } = await supabase
+        .from('marketplace_offers')
+        .update({ status: 'accepted' })
+        .eq('id', offerId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Success',
+        description: 'Offer accepted',
+      });
+
+      fetchMarketplaceOffers();
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to accept offer',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleRejectOffer = async (offerId: string) => {
+    try {
+      const { error } = await supabase
+        .from('marketplace_offers')
+        .update({ status: 'rejected' })
+        .eq('id', offerId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Success',
+        description: 'Offer rejected',
+      });
+
+      fetchMarketplaceOffers();
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to reject offer',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const filteredItems = marketItems.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          item.farmName.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -133,40 +204,44 @@ const Marketplace: React.FC = () => {
     return matchesSearch && matchesCategory;
   });
 
+  const offersByCurrentUser = offers.filter(
+    offer => offer.marketplace_products.user_id === user?.id
+  );
+
   return (
     <div className="farmlink-container py-10">
-      <h1 className="text-2xl md:text-3xl font-bold mb-6 text-farmlink-secondary">Marketplace</h1>
-      
-      <div className="bg-white rounded-lg shadow-md p-4 mb-8">
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search size={18} className="text-gray-400" />
+      {offersByCurrentUser.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-xl font-bold mb-4">Offers Received</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {offersByCurrentUser.map(offer => (
+              <div key={offer.id} className="bg-white p-4 rounded-lg shadow-md">
+                <h3 className="text-lg font-semibold mb-2">
+                  Offer for {offer.marketplace_products.name}
+                </h3>
+                <p>Offer Amount: ₹{offer.offer_amount}</p>
+                <p>Message: {offer.message}</p>
+                <div className="flex space-x-2 mt-2">
+                  <Button 
+                    variant="default" 
+                    size="sm"
+                    onClick={() => handleAcceptOffer(offer.id)}
+                  >
+                    Accept
+                  </Button>
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                    onClick={() => handleRejectOffer(offer.id)}
+                  >
+                    Reject
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
-          <input
-            type="text"
-            className="form-input pl-10 w-full"
-            placeholder="Search by produce, farm name or location..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
         </div>
-        
-        <div className="mt-4 flex flex-wrap gap-2">
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              className={`px-3 py-1 text-sm rounded-full ${
-                selectedCategory === category 
-                  ? 'bg-farmlink-primary text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-      </div>
+      )}
 
       {loading ? (
         <div className="text-center py-12">
