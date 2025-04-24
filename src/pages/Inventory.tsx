@@ -66,8 +66,8 @@ const Inventory: React.FC = () => {
     if (!item) return;
     
     try {
-      const { user } = await supabase.auth.getUser();
-      if (!user?.id) {
+      const { data, error: userError } = await supabase.auth.getUser();
+      if (userError || !data.user?.id) {
         toast({
           title: "Error",
           description: "You must be logged in to add products to marketplace",
@@ -77,7 +77,7 @@ const Inventory: React.FC = () => {
       }
       
       const marketplaceItem = {
-        user_id: user.id,
+        user_id: data.user.id,
         name: item.name,
         quantity: item.quantity,
         unit: item.unit,
