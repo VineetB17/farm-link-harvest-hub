@@ -30,7 +30,11 @@ export const useEquipment = () => {
         .eq('available', true);
 
       if (equipmentError) throw equipmentError;
-      setEquipment(equipmentData || []);
+      // Convert database records to our Equipment type
+      setEquipment(equipmentData?.map(item => ({
+        ...item,
+        status: item.status as 'available' | 'borrowed' | 'requested' | 'pending',
+      })) || []);
 
       if (user) {
         // Fetch my listed items
@@ -38,7 +42,12 @@ export const useEquipment = () => {
           .from('equipment_listings')
           .select('*')
           .eq('owner_id', user.id);
-        setMyListedItems(myListings || []);
+        
+        // Convert to our Equipment type
+        setMyListedItems(myListings?.map(item => ({
+          ...item,
+          status: item.status as 'available' | 'borrowed' | 'requested' | 'pending',
+        })) || []);
 
         // Fetch my requested items
         const { data: myRequests } = await supabase
@@ -47,7 +56,11 @@ export const useEquipment = () => {
           .eq('borrower_id', user.id);
 
         if (myRequests) {
-          setRequestedItems(myRequests.map(request => request.equipment_listings));
+          // Convert to our Equipment type
+          setRequestedItems(myRequests.map(request => ({
+            ...request.equipment_listings,
+            status: request.equipment_listings.status as 'available' | 'borrowed' | 'requested' | 'pending',
+          })));
         }
       }
     } catch (error: any) {
@@ -87,7 +100,7 @@ export const useEquipment = () => {
         .insert([{
           ...newItem,
           owner_id: user.id,
-          owner_name: user.user_metadata.name || user.email,
+          owner_name: user.name || user.email,
         }])
         .select()
         .single();
@@ -119,7 +132,7 @@ export const useEquipment = () => {
         .insert([{
           equipment_id: selectedEquipment.id,
           borrower_id: user.id,
-          borrower_name: user.user_metadata.name || user.email,
+          borrower_name: user.name || user.email,
           start_date: request.startDate,
           end_date: request.endDate,
           message: request.message,

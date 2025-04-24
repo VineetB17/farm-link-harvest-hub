@@ -11,6 +11,10 @@ export interface Equipment {
   status: 'available' | 'borrowed' | 'requested' | 'pending';
   created_at?: string;
   updated_at?: string;
+  
+  // Additional properties needed by EquipmentCard
+  owner?: string; // For backward compatibility
+  listedById?: string; // For backward compatibility
 }
 
 export interface BorrowRequest {

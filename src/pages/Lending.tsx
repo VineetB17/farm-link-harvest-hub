@@ -42,7 +42,7 @@ const Lending: React.FC = () => {
 
   const handleBorrowClick = (equipment: Equipment) => {
     // Prevent borrowing own equipment
-    if (user && (equipment.listedById === user.id || equipment.owner === user.name)) {
+    if (user && (equipment.owner_id === user.id || equipment.owner_name === user.name)) {
       return;
     }
     setSelectedEquipment(equipment);
@@ -51,13 +51,13 @@ const Lending: React.FC = () => {
 
   const filteredItems = equipment.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         item.owner.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         item.owner_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          item.location.toLowerCase().includes(searchTerm.toLowerCase());
                          
     const matchesCategory = selectedCategory === 'All Categories' || item.category === selectedCategory;
     
     // Filter out items listed by the current user from the available tab
-    const isNotOwnItem = !(user && (item.listedById === user.id || item.owner === user.name));
+    const isNotOwnItem = !(user && (item.owner_id === user.id || item.owner_name === user.name));
     
     return matchesSearch && matchesCategory && isNotOwnItem;
   });

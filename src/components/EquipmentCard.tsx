@@ -2,18 +2,7 @@
 import React from 'react';
 import { MapPin, User, Tag } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-
-export interface Equipment {
-  id: string;
-  name: string;
-  category: string;
-  owner: string;
-  location: string;
-  available: boolean;
-  description: string;
-  status?: 'available' | 'borrowed' | 'requested' | 'pending';
-  listedById?: string;
-}
+import { Equipment } from '@/types/equipment';
 
 interface EquipmentCardProps {
   equipment: Equipment;
@@ -23,7 +12,8 @@ interface EquipmentCardProps {
 const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment, onBorrow }) => {
   const { user } = useAuth();
   
-  const isOwnEquipment = user && (equipment.listedById === user.id || equipment.owner === user.name);
+  // Use owner_id and owner_name from our unified Equipment type
+  const isOwnEquipment = user && (equipment.owner_id === user.id || equipment.owner_name === (user.name ?? ''));
   
   const handleBorrowClick = () => {
     if (equipment.available && !isOwnEquipment && onBorrow) {
@@ -53,7 +43,7 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment, onBorrow }) =>
       <div className="space-y-2 mb-4">
         <div className="flex items-center text-sm">
           <User size={14} className="mr-2 text-gray-500" />
-          <span className="text-gray-700">{equipment.owner}</span>
+          <span className="text-gray-700">{equipment.owner_name}</span>
         </div>
         <div className="flex items-center text-sm">
           <MapPin size={14} className="mr-2 text-gray-500" />
