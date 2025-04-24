@@ -51,14 +51,12 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
 // Main App component with routes
 const AppContent = () => {
-  const { login, signup } = useAuth();
-  
   return (
     <Layout>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login onLogin={login} />} />
-        <Route path="/signup" element={<Signup onSignup={signup} />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/marketplace" element={<Marketplace />} />
         
         {/* Protected routes */}
