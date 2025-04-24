@@ -14,6 +14,7 @@ export interface Produce {
   location: string;
   category?: string;
   image_url?: string;
+  price?: number; // Added price property
 }
 
 interface ProduceCardProps {
@@ -42,9 +43,16 @@ const ProduceCard: React.FC<ProduceCardProps> = ({ produce }) => {
           <h3 className="font-semibold text-lg text-farmlink-secondary">{produce.name}</h3>
           <p className="text-sm text-gray-600">{produce.farmName}</p>
         </div>
-        <span className="text-farmlink-primary font-semibold bg-farmlink-light px-3 py-1 rounded-full">
-          {produce.quantity} {produce.unit}
-        </span>
+        <div className="flex flex-col items-end">
+          <span className="text-farmlink-primary font-semibold bg-farmlink-light px-3 py-1 rounded-full">
+            {produce.quantity} {produce.unit}
+          </span>
+          {produce.price !== undefined && (
+            <span className="text-green-600 font-bold mt-1">
+              ${produce.price.toFixed(2)}/{produce.unit}
+            </span>
+          )}
+        </div>
       </div>
 
       {produce.category && (
