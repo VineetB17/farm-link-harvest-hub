@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Equipment } from '@/types/equipment';
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from '@/contexts/AuthContext';
+import { User } from '@/types/user';
 
 export const useEquipment = () => {
   const [equipment, setEquipment] = useState<Equipment[]>([]);

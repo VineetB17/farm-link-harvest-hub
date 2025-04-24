@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import ProfileDetails from '@/components/profile/ProfileDetails';
+import { User } from '@/types/user'; // Import our extended User type
 
 const Profile: React.FC = () => {
   const { user } = useAuth();

@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { MapPin, User, Tag } from 'lucide-react';
+import { MapPin, User as UserIcon, Tag } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { User } from '@/types/user'; // Import our extended User type
 
 export interface Equipment {
   id: string;

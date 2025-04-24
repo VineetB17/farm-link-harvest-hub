@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/supabase';
-import { User } from '@supabase/supabase-js';
+import { User } from '@/types/user'; // Import our extended User type
 
 interface AuthContextType {
   user: User | null;
@@ -22,7 +22,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user || null);
+      // Type cast to our extended User type
+      setUser(session?.user as User || null);
       setIsLoggedIn(!!session);
     });
 
