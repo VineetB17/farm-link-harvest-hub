@@ -12,7 +12,6 @@ interface EquipmentCardProps {
 const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment, onBorrow }) => {
   const { user } = useAuth();
   
-  // Use owner_id and owner_name from our unified Equipment type
   const isOwnEquipment = user && (equipment.owner_id === user.id || equipment.owner_name === (user.name ?? ''));
   
   const handleBorrowClick = () => {
@@ -23,6 +22,20 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment, onBorrow }) =>
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition-all">
+      <div className="aspect-video mb-4 relative overflow-hidden rounded-lg bg-gray-100">
+        {equipment.image_url ? (
+          <img 
+            src={equipment.image_url} 
+            alt={equipment.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <Tag size={48} className="text-gray-300" />
+          </div>
+        )}
+      </div>
+
       <div className="flex justify-between items-start mb-3">
         <div className="flex items-center">
           <Tag size={16} className="text-farmlink-accent mr-2" />

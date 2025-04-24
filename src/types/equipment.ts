@@ -1,4 +1,3 @@
-
 export interface Equipment {
   id: string;
   name: string;
@@ -11,6 +10,7 @@ export interface Equipment {
   status: 'available' | 'borrowed' | 'requested' | 'pending';
   created_at?: string;
   updated_at?: string;
+  image_url?: string | null;
   
   // Additional properties needed by EquipmentCard
   owner?: string; // For backward compatibility
