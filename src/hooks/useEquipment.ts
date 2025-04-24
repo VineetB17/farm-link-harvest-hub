@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Equipment, BorrowRequest } from '@/types/equipment';
 import { useToast } from "@/components/ui/use-toast";
@@ -87,10 +88,9 @@ export const useEquipment = () => {
       
       if (error) throw error;
       
-      // Fix: Use direct type casting without recursive type inference
+      // Fix: Break the circular reference using type assertion
       if (data) {
-        // Cast to any first to break the circular reference, then to BorrowRequest[]
-        setBorrowRequests(data as any as BorrowRequest[]);
+        setBorrowRequests(data as unknown as BorrowRequest[]);
       }
     } catch (error: any) {
       console.error('Error fetching borrow requests:', error);

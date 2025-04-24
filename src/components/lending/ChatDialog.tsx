@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,8 @@ interface ChatDialogProps {
   recipientId: string;
   recipientName: string;
   requestId: string;
+  externalMessages?: LendingMessage[];
+  onSendMessage?: (message: string) => Promise<void>;
 }
 
 const ChatDialog: React.FC<ChatDialogProps> = ({
@@ -22,18 +23,22 @@ const ChatDialog: React.FC<ChatDialogProps> = ({
   onClose,
   recipientId,
   recipientName,
-  requestId
+  requestId,
+  externalMessages,
+  onSendMessage
 }) => {
   const [newMessage, setNewMessage] = useState('');
   const [messages, setMessages] = useState<LendingMessage[]>([]);
   const { user } = useAuth();
 
   useEffect(() => {
-    if (isOpen && requestId) {
+    if (externalMessages && externalMessages.length > 0) {
+      setMessages(externalMessages);
+    } else if (isOpen && requestId) {
       fetchMessages();
       setupRealtimeSubscription();
     }
-  }, [isOpen, requestId]);
+  }, [isOpen, requestId, externalMessages]);
 
   const fetchMessages = async () => {
     if (!requestId) return;
@@ -78,16 +83,21 @@ const ChatDialog: React.FC<ChatDialogProps> = ({
     if (!user || !newMessage.trim() || !requestId) return;
 
     try {
-      const { error } = await supabase
-        .from('lending_messages')
-        .insert([{
-          request_id: requestId,
-          sender_id: user.id,
-          sender_name: user.name || user.email,
-          message: newMessage.trim()
-        }]);
+      if (onSendMessage) {
+        await onSendMessage(newMessage.trim());
+      } else {
+        const { error } = await supabase
+          .from('lending_messages')
+          .insert([{
+            request_id: requestId,
+            sender_id: user.id,
+            sender_name: user.name || user.email,
+            message: newMessage.trim()
+          }]);
 
-      if (error) throw error;
+        if (error) throw error;
+      }
+      
       setNewMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
