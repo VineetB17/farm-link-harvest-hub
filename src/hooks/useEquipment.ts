@@ -89,9 +89,11 @@ export const useEquipment = () => {
       
       if (error) throw error;
       
-      // Ensure each item in data has all required properties for BorrowRequest
+      // Use type assertion without recursive type instantiation
       if (data) {
-        setBorrowRequests(data as BorrowRequest[]);
+        // Use a simple type cast to satisfy TypeScript
+        const typedRequests = data as unknown as BorrowRequest[];
+        setBorrowRequests(typedRequests);
       }
     } catch (error: any) {
       console.error('Error fetching borrow requests:', error);
