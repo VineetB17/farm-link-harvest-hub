@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,15 @@ import ImageUpload from './ui/image-upload';
 interface InventoryFormProps {
   onAddProduce: (produce: Omit<Produce, 'id'> & { image?: File }) => void;
 }
+
+const categories = [
+  "Fruits",
+  "Vegetables", 
+  "Grains",
+  "Dairy",
+  "Nuts",
+  "Other"
+];
 
 const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
   const [name, setName] = useState('');
