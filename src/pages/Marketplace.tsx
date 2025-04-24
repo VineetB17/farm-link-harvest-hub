@@ -1,7 +1,6 @@
-
 import React, { useEffect, useState } from 'react';
 import ProduceCard, { Produce } from '@/components/ProduceCard';
-import { Search, Filter, ShoppingCart, Trash2, Handshake } from 'lucide-react';
+import { Search, Filter, Trash2, Handshake } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -106,7 +105,7 @@ const Marketplace: React.FC = () => {
           product_id: produce.id,
           user_id: user.id,
           offer_amount: produce.price,
-          message: `Initial offer for ${produce.name}`
+          message: `I'm interested in purchasing ${produce.name}`
         });
 
       if (error) throw error;
@@ -206,12 +205,6 @@ interface MarketplaceCardProps {
 }
 
 const MarketplaceCard: React.FC<MarketplaceCardProps> = ({ produce, isOwner, onDelete, onMakeOffer }) => {
-  console.log('Item ownership check:', { 
-    isOwner, 
-    produceUserId: produce.user_id, 
-    itemName: produce.name 
-  });
-  
   return (
     <div className="p-4 bg-white rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition-all">
       {produce.image_url && (
