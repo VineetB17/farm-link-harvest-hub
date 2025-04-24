@@ -1,10 +1,12 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/supabase';
+import { User as SupabaseUser, Session as SupabaseSession } from '@supabase/supabase-js';
 
-interface User {
+interface ProfileData {
   id: string;
-  name: string;
+  name?: string;
   email: string;
   farmName?: string;
   location?: string;
@@ -21,41 +23,46 @@ interface User {
   bioDescription?: string;
 }
 
-interface Session {
-  user: {
-    id: string;
-    email: string;
-    name: string;
-  };
-}
-
 interface AuthContextType {
-  user: User | null;
+  user: ProfileData | null;
   isLoggedIn: boolean;
-  login: (email: string, password: string) => void;
-  signup: (name: string, email: string, password: string, farmName?: string, location?: string) => void;
-  logout: () => void;
-  updateUserProfile: (userData: Partial<User>) => void;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (name: string, email: string, password: string, farmName?: string, location?: string) => Promise<void>;
+  logout: () => Promise<void>;
+  updateUserProfile: (userData: Partial<ProfileData>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<ProfileData | null>(null);
+  const [session, setSession] = useState<SupabaseSession | null>(null);
   const { toast } = useToast();
+
+  // Function to transform Supabase user data into our ProfileData format
+  const transformUserData = (supabaseUser: SupabaseUser | null): ProfileData | null => {
+    if (!supabaseUser) return null;
+    
+    return {
+      id: supabaseUser.id,
+      email: supabaseUser.email || '',
+      name: supabaseUser.user_metadata?.name,
+      farmName: supabaseUser.user_metadata?.farm_name,
+      location: supabaseUser.user_metadata?.location,
+    };
+  };
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+      (event, supabaseSession) => {
+        setSession(supabaseSession);
+        setUser(transformUserData(supabaseSession?.user ?? null));
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    supabase.auth.getSession().then(({ data: { session: supabaseSession } }) => {
+      setSession(supabaseSession);
+      setUser(transformUserData(supabaseSession?.user ?? null));
     });
 
     return () => subscription.unsubscribe();
@@ -116,7 +123,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const updateUserProfile = async (userData: Partial<User>) => {
+  const updateUserProfile = async (userData: Partial<ProfileData>) => {
     if (!user) return;
     
     const updatedUser = {
