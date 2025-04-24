@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { User, MapPin, Mail, Phone, Building2 } from 'lucide-react';
+import { User, MapPin, Mail, Phone, Building2, Globe } from 'lucide-react';
 
 interface ProfileFormData {
   name: string;
@@ -46,7 +46,7 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ isEditing, formData, on
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Email</label>
-              <Input name="email" value={formData.email} onChange={onInputChange} />
+              <Input name="email" value={formData.email} disabled />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Website</label>
@@ -59,7 +59,7 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ isEditing, formData, on
               <User size={20} className="text-farmlink-primary mt-1 mr-3" />
               <div>
                 <h3 className="font-medium text-gray-700">Full Name</h3>
-                <p>{formData.name}</p>
+                <p>{formData.name || 'Not set'}</p>
               </div>
             </div>
             
@@ -67,7 +67,7 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ isEditing, formData, on
               <Building2 size={20} className="text-farmlink-primary mt-1 mr-3" />
               <div>
                 <h3 className="font-medium text-gray-700">Farm Name</h3>
-                <p>{formData.farmName}</p>
+                <p>{formData.farmName || 'Not set'}</p>
               </div>
             </div>
             
@@ -75,7 +75,7 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ isEditing, formData, on
               <MapPin size={20} className="text-farmlink-primary mt-1 mr-3" />
               <div>
                 <h3 className="font-medium text-gray-700">Location</h3>
-                <p>{formData.location}</p>
+                <p>{formData.location || 'Not set'}</p>
               </div>
             </div>
             
@@ -83,7 +83,7 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ isEditing, formData, on
               <Mail size={20} className="text-farmlink-primary mt-1 mr-3" />
               <div>
                 <h3 className="font-medium text-gray-700">Email</h3>
-                <p>{formData.email}</p>
+                <p>{formData.email || 'Not set'}</p>
               </div>
             </div>
             
@@ -91,7 +91,15 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ isEditing, formData, on
               <Phone size={20} className="text-farmlink-primary mt-1 mr-3" />
               <div>
                 <h3 className="font-medium text-gray-700">Phone</h3>
-                <p>{formData.phone}</p>
+                <p>{formData.phone || 'Not set'}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start">
+              <Globe size={20} className="text-farmlink-primary mt-1 mr-3" />
+              <div>
+                <h3 className="font-medium text-gray-700">Website</h3>
+                <p>{formData.website || 'Not set'}</p>
               </div>
             </div>
           </div>

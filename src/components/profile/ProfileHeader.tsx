@@ -1,14 +1,21 @@
 
 import React from 'react';
 import { User } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface ProfileHeaderProps {
   name: string;
   isEditing: boolean;
+  isLoading?: boolean;
   onEditClick: () => void;
 }
 
-const ProfileHeader: React.FC<ProfileHeaderProps> = ({ name, isEditing, onEditClick }) => {
+const ProfileHeader: React.FC<ProfileHeaderProps> = ({ 
+  name, 
+  isEditing, 
+  isLoading = false,
+  onEditClick 
+}) => {
   return (
     <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6 mb-8">
       <div className="flex items-center">
@@ -17,16 +24,21 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ name, isEditing, onEditCl
         </div>
         <div className="ml-4">
           <h1 className="text-2xl md:text-3xl font-bold text-farmlink-secondary">My Profile</h1>
-          <p className="text-gray-600">Welcome, {name}</p>
+          <p className="text-gray-600">Welcome, {name || 'User'}</p>
         </div>
       </div>
       
-      <button 
+      <Button 
         onClick={onEditClick}
+        disabled={isLoading}
         className="flex items-center px-4 py-2 bg-farmlink-primary text-white rounded-md hover:bg-farmlink-secondary transition-colors"
       >
-        {isEditing ? 'Save Changes' : 'Edit Profile'}
-      </button>
+        {isLoading ? (
+          'Saving...'
+        ) : (
+          isEditing ? 'Save Changes' : 'Edit Profile'
+        )}
+      </Button>
     </div>
   );
 };
