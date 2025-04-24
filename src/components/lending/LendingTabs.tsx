@@ -1,12 +1,12 @@
 
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Equipment } from '@/types/equipment';
+import { Equipment, BorrowRequest } from '@/types/equipment';
 import EquipmentList from './EquipmentList';
 import BorrowedEquipmentList from './BorrowedEquipmentList';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, Check, X } from "lucide-react";
 
 interface LendingTabsProps {
   equipment: Equipment[];
@@ -14,9 +14,12 @@ interface LendingTabsProps {
   myBorrowings: Equipment[];
   requestedItems: Equipment[];
   myListedItems: Equipment[];
+  incomingRequests: BorrowRequest[];
   onBorrowClick: (equipment: Equipment) => void;
   onReturnEquipment: (id: string) => void;
   onDeleteListing: (id: string) => void;
+  onAcceptRequest: (requestId: string) => void;
+  onDeclineRequest: (requestId: string) => void;
 }
 
 const LendingTabs: React.FC<LendingTabsProps> = ({
@@ -25,9 +28,12 @@ const LendingTabs: React.FC<LendingTabsProps> = ({
   myBorrowings,
   requestedItems,
   myListedItems,
+  incomingRequests,
   onBorrowClick,
   onReturnEquipment,
-  onDeleteListing
+  onDeleteListing,
+  onAcceptRequest,
+  onDeclineRequest
 }) => {
   return (
     <Tabs defaultValue="available">
@@ -36,6 +42,7 @@ const LendingTabs: React.FC<LendingTabsProps> = ({
         <TabsTrigger value="borrowed">Borrowed ({myBorrowings.length})</TabsTrigger>
         <TabsTrigger value="requested">Requested ({requestedItems.length})</TabsTrigger>
         <TabsTrigger value="myListings">My Listings ({myListedItems.length})</TabsTrigger>
+        <TabsTrigger value="requests">Requests ({incomingRequests.length})</TabsTrigger>
       </TabsList>
 
       <TabsContent value="available">
@@ -110,6 +117,60 @@ const LendingTabs: React.FC<LendingTabsProps> = ({
         ) : (
           <div className="text-center py-12 border border-dashed border-gray-300 rounded-lg">
             <p className="text-gray-500">You haven't listed any equipment yet.</p>
+          </div>
+        )}
+      </TabsContent>
+
+      <TabsContent value="requests">
+        {incomingRequests.length > 0 ? (
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Equipment</TableHead>
+                  <TableHead>Borrower</TableHead>
+                  <TableHead>Dates</TableHead>
+                  <TableHead>Message</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {incomingRequests.map((request) => (
+                  <TableRow key={request.id}>
+                    <TableCell className="font-medium">
+                      {request.equipment_listings ? request.equipment_listings.name : "Unknown Equipment"}
+                    </TableCell>
+                    <TableCell>{request.borrower_name}</TableCell>
+                    <TableCell>
+                      {new Date(request.start_date).toLocaleDateString()} - {new Date(request.end_date).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>{request.message || "No message"}</TableCell>
+                    <TableCell className="space-x-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700"
+                        onClick={() => onAcceptRequest(request.id)}
+                      >
+                        <Check size={16} className="mr-1" /> Accept
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        className="bg-red-50 hover:bg-red-100 border-red-200 text-red-700"
+                        onClick={() => onDeclineRequest(request.id)}
+                      >
+                        <X size={16} className="mr-1" /> Decline
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        ) : (
+          <div className="text-center py-12 border border-dashed border-gray-300 rounded-lg">
+            <p className="text-gray-500">No pending requests for your equipment.</p>
           </div>
         )}
       </TabsContent>
