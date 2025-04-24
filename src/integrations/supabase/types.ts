@@ -63,6 +63,7 @@ export type Database = {
           created_at: string
           description: string
           id: string
+          image_url: string | null
           location: string
           name: string
           owner_id: string
@@ -76,6 +77,7 @@ export type Database = {
           created_at?: string
           description: string
           id?: string
+          image_url?: string | null
           location: string
           name: string
           owner_id: string
@@ -89,6 +91,7 @@ export type Database = {
           created_at?: string
           description?: string
           id?: string
+          image_url?: string | null
           location?: string
           name?: string
           owner_id?: string
