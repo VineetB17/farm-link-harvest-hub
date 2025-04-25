@@ -26,14 +26,21 @@ export function useNotifications() {
       try {
         console.log("Fetching notifications for user:", user?.id);
         
-        // Add auth header explicitly to make sure it's present
-        const { data, error, status } = await supabase.functions.invoke('get_notifications', {
+        // Get current session token
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData.session?.access_token;
+        
+        if (!accessToken) {
+          console.error("No access token available");
+          throw new Error("Authentication required");
+        }
+        
+        // Invoke edge function with the access token
+        const { data, error } = await supabase.functions.invoke('get_notifications', {
           headers: {
-            Authorization: `Bearer ${supabase.auth.session()?.access_token}`
+            Authorization: `Bearer ${accessToken}`
           }
         });
-        
-        console.log("Edge function response status:", status);
         
         if (error) {
           console.error("Edge function error:", error);
@@ -52,7 +59,7 @@ export function useNotifications() {
         return [];
       }
     },
-    enabled: !!user && !!supabase.auth.session()?.access_token
+    enabled: !!user
   });
 
   const markAsRead = useMutation({
@@ -60,15 +67,22 @@ export function useNotifications() {
       try {
         console.log("Marking notification as read:", notificationId);
         
-        // Add auth header explicitly to make sure it's present
-        const { error, status } = await supabase.functions.invoke('mark_notification_read', {
+        // Get current session token
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData.session?.access_token;
+        
+        if (!accessToken) {
+          console.error("No access token available");
+          throw new Error("Authentication required");
+        }
+        
+        // Invoke edge function with the access token
+        const { error } = await supabase.functions.invoke('mark_notification_read', {
           body: { notification_id: notificationId },
           headers: {
-            Authorization: `Bearer ${supabase.auth.session()?.access_token}`
+            Authorization: `Bearer ${accessToken}`
           }
         });
-        
-        console.log("Edge function response status:", status);
         
         if (error) {
           console.error("Edge function error:", error);
