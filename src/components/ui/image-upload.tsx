@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { Upload } from 'lucide-react';
+import React, { useState } from 'react';
+import { Upload, Image } from 'lucide-react';
 import { Button } from './button';
 
 interface ImageUploadProps {
@@ -10,6 +10,7 @@ interface ImageUploadProps {
 
 const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelect, previewUrl }) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [isHovering, setIsHovering] = useState(false);
 
   const handleClick = () => {
     fileInputRef.current?.click();
@@ -33,23 +34,28 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelect, previewUrl }) 
       />
       
       {previewUrl ? (
-        <div className="relative w-full aspect-video">
+        <div 
+          className="relative w-full aspect-video cursor-pointer"
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+          onClick={handleClick}
+        >
           <img
             src={previewUrl}
-            alt="Preview image"
+            alt="Preview"
             className="w-full h-full object-cover rounded-lg"
             onError={(e) => {
               console.error("Preview image failed to load:", previewUrl);
               (e.target as HTMLImageElement).src = "/placeholder.svg";
             }}
           />
-          <Button
-            onClick={handleClick}
-            variant="secondary"
-            className="absolute bottom-2 right-2"
+          <div 
+            className={`absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center transition-opacity rounded-lg ${
+              isHovering ? 'opacity-100' : 'opacity-0'
+            }`}
           >
-            Change Image
-          </Button>
+            <span className="text-white font-medium">Change Image</span>
+          </div>
         </div>
       ) : (
         <Button

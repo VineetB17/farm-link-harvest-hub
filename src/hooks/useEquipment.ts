@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Equipment, BorrowRequest } from '@/types/equipment';
 import { useToast } from "@/components/ui/use-toast";
@@ -123,16 +124,18 @@ export const useEquipment = () => {
     };
   };
 
-  const handleAddEquipment = async (newItem: Omit<Equipment, 'id' | 'owner_id' | 'owner_name'>) => {
+  const handleAddEquipment = async (newItem: Partial<Equipment>) => {
     if (!user) return;
     
     try {
+      console.log("Adding equipment with image:", newItem.image_url);
+      
       const { data, error } = await supabase
         .from('equipment_listings')
         .insert([{
           ...newItem,
           owner_id: user.id,
-          owner_name: user.name || user.email,
+          owner_name: user.user_metadata?.name || user.email,
         }])
         .select()
         .single();
@@ -143,6 +146,9 @@ export const useEquipment = () => {
         title: "Equipment Added",
         description: "Your equipment has been listed for lending"
       });
+      
+      // Refresh equipment listings
+      fetchEquipment();
       
       return data;
     } catch (error: any) {

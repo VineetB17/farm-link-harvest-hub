@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { PlusCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Equipment } from '@/types/equipment';
@@ -8,6 +9,7 @@ import CategoryFilter from '@/components/lending/CategoryFilter';
 import LendingTabs from '@/components/lending/LendingTabs';
 import { useEquipment } from '@/hooks/useEquipment';
 import { useAuth } from '@/contexts/AuthContext';
+import { ensureEquipmentImagesBucket } from '@/utils/ensureStorageBucket';
 
 const categories = [
   "All Categories",
@@ -26,6 +28,11 @@ const Lending: React.FC = () => {
   const [showBorrowForm, setShowBorrowForm] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
   const { user } = useAuth();
+
+  useEffect(() => {
+    // Ensure equipment images bucket exists when component mounts
+    ensureEquipmentImagesBucket();
+  }, []);
 
   const {
     equipment,
