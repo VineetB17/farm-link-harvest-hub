@@ -13,8 +13,6 @@ export interface Produce {
   location: string;
   category?: string;
   image_url?: string;
-  price?: number;
-  user_id?: string;
 }
 
 interface ProduceCardProps {
