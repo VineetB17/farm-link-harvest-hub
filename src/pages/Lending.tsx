@@ -46,7 +46,8 @@ const Lending: React.FC = () => {
     handleReturnEquipment,
     handleDeleteListing,
     handleAcceptRequest,
-    handleDeclineRequest
+    handleDeclineRequest,
+    handleEditEquipment
   } = useEquipment();
 
   const handleBorrowClick = (equipment: Equipment) => {
