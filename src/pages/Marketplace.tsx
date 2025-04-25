@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import RequestsSection from '@/components/marketplace/RequestsSection';
+import HistorySection from '@/components/marketplace/HistorySection';
 import { Button } from '@/components/ui/button';
 
 const categories = [
@@ -24,12 +25,14 @@ const Marketplace: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [loading, setLoading] = useState(true);
   const [offers, setOffers] = useState<any[]>([]);
+  const [history, setHistory] = useState<any[]>([]);
   const { toast } = useToast();
   const { user } = useAuth();
 
   useEffect(() => {
     fetchMarketplaceItems();
     fetchMarketplaceOffers();
+    fetchOffersHistory();
   }, []);
 
   const fetchMarketplaceItems = async () => {
@@ -84,6 +87,24 @@ const Marketplace: React.FC = () => {
       toast({
         title: 'Error',
         description: 'Failed to load marketplace offers',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const fetchOffersHistory = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('marketplace_offers_history')
+        .select('*')
+        .order('action_date', { ascending: false });
+
+      if (error) throw error;
+      setHistory(data || []);
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: 'Failed to load offers history',
         variant: 'destructive',
       });
     }
@@ -150,6 +171,9 @@ const Marketplace: React.FC = () => {
 
   const handleAcceptOffer = async (offerId: string, productId: string) => {
     try {
+      const offer = offers.find(o => o.id === offerId);
+      if (!offer) throw new Error('Offer not found');
+
       const { error: offerError } = await supabase
         .from('marketplace_offers')
         .update({ status: 'accepted' })
@@ -164,6 +188,20 @@ const Marketplace: React.FC = () => {
 
       if (productError) throw productError;
 
+      const { error: historyError } = await supabase
+        .from('marketplace_offers_history')
+        .insert({
+          offer_id: offerId,
+          product_name: offer.marketplace_products.name,
+          buyer_name: offer.borrower_name || 'Unknown',
+          offer_amount: offer.offer_amount,
+          status: 'accepted',
+          seller_id: user?.id,
+          message: offer.message
+        });
+
+      if (historyError) throw historyError;
+
       toast({
         title: 'Success',
         description: 'Offer accepted and item removed from marketplace',
@@ -171,6 +209,7 @@ const Marketplace: React.FC = () => {
 
       fetchMarketplaceItems();
       fetchMarketplaceOffers();
+      fetchOffersHistory();
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -182,12 +221,29 @@ const Marketplace: React.FC = () => {
 
   const handleRejectOffer = async (offerId: string) => {
     try {
-      const { error } = await supabase
+      const offer = offers.find(o => o.id === offerId);
+      if (!offer) throw new Error('Offer not found');
+
+      const { error: offerError } = await supabase
         .from('marketplace_offers')
         .update({ status: 'rejected' })
         .eq('id', offerId);
 
-      if (error) throw error;
+      if (offerError) throw offerError;
+
+      const { error: historyError } = await supabase
+        .from('marketplace_offers_history')
+        .insert({
+          offer_id: offerId,
+          product_name: offer.marketplace_products.name,
+          buyer_name: offer.borrower_name || 'Unknown',
+          offer_amount: offer.offer_amount,
+          status: 'rejected',
+          seller_id: user?.id,
+          message: offer.message
+        });
+
+      if (historyError) throw historyError;
 
       toast({
         title: 'Success',
@@ -195,6 +251,7 @@ const Marketplace: React.FC = () => {
       });
 
       fetchMarketplaceOffers();
+      fetchOffersHistory();
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -224,6 +281,7 @@ const Marketplace: React.FC = () => {
         <TabsList>
           <TabsTrigger value="marketplace">Marketplace</TabsTrigger>
           <TabsTrigger value="requests">Requests ({offersByCurrentUser.length})</TabsTrigger>
+          <TabsTrigger value="history">History</TabsTrigger>
         </TabsList>
 
         <TabsContent value="marketplace">
@@ -260,6 +318,10 @@ const Marketplace: React.FC = () => {
             onAccept={handleAcceptOffer}
             onReject={handleRejectOffer}
           />
+        </TabsContent>
+
+        <TabsContent value="history">
+          <HistorySection history={history} />
         </TabsContent>
       </Tabs>
     </div>

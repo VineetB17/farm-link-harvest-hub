@@ -255,6 +255,50 @@ export type Database = {
           },
         ]
       }
+      marketplace_offers_history: {
+        Row: {
+          action_date: string
+          buyer_name: string
+          id: string
+          message: string | null
+          offer_amount: number
+          offer_id: string | null
+          product_name: string
+          seller_id: string
+          status: string
+        }
+        Insert: {
+          action_date?: string
+          buyer_name: string
+          id?: string
+          message?: string | null
+          offer_amount: number
+          offer_id?: string | null
+          product_name: string
+          seller_id: string
+          status: string
+        }
+        Update: {
+          action_date?: string
+          buyer_name?: string
+          id?: string
+          message?: string | null
+          offer_amount?: number
+          offer_id?: string | null
+          product_name?: string
+          seller_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_offers_history_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       marketplace_products: {
         Row: {
           category: string
