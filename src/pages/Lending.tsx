@@ -71,6 +71,11 @@ const Lending: React.FC = () => {
     return matchesSearch && matchesCategory && isNotOwnItem;
   });
 
+  // Create a handler that matches the expected type in AddLendingItemForm
+  const handleItemAdd = async (item: Partial<Equipment>) => {
+    await handleAddEquipment(item);
+  };
+
   return (
     <div className="farmlink-container py-10">
       <h1 className="text-2xl md:text-3xl font-bold mb-6 text-farmlink-secondary">Equipment Lending</h1>
@@ -96,7 +101,7 @@ const Lending: React.FC = () => {
       {showAddForm && (
         <div className="mb-6">
           <AddLendingItemForm 
-            onSubmit={handleAddEquipment}
+            onSubmit={handleItemAdd}
             onClose={() => setShowAddForm(false)}
           />
         </div>

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/supabase';
@@ -21,6 +20,11 @@ interface ProfileData {
   yearEstablished?: string;
   website?: string;
   bioDescription?: string;
+  user_metadata?: {
+    name?: string;
+    farm_name?: string;
+    location?: string;
+  };
 }
 
 interface AuthContextType {
@@ -39,7 +43,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<SupabaseSession | null>(null);
   const { toast } = useToast();
 
-  // Function to transform Supabase user data into our ProfileData format
   const transformUserData = (supabaseUser: SupabaseUser | null): ProfileData | null => {
     if (!supabaseUser) return null;
     
@@ -49,6 +52,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       name: supabaseUser.user_metadata?.name,
       farmName: supabaseUser.user_metadata?.farm_name,
       location: supabaseUser.user_metadata?.location,
+      user_metadata: supabaseUser.user_metadata
     };
   };
 

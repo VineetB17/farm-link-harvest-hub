@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Equipment, BorrowRequest } from '@/types/equipment';
 import { useToast } from "@/components/ui/use-toast";
@@ -124,19 +123,26 @@ export const useEquipment = () => {
     };
   };
 
-  const handleAddEquipment = async (newItem: Partial<Equipment>) => {
+  const handleAddEquipment = async (newItem: Partial<Equipment>): Promise<void> => {
     if (!user) return;
     
     try {
       console.log("Adding equipment with image:", newItem.image_url);
       
+      // Fix: Ensure all required fields are present in the equipment object
+      const equipmentData = {
+        name: newItem.name || '',
+        category: newItem.category || '',
+        description: newItem.description || '',
+        location: newItem.location || '',
+        image_url: newItem.image_url,
+        owner_id: user.id,
+        owner_name: user.name || user.email || '',
+      };
+      
       const { data, error } = await supabase
         .from('equipment_listings')
-        .insert([{
-          ...newItem,
-          owner_id: user.id,
-          owner_name: user.user_metadata?.name || user.email,
-        }])
+        .insert([equipmentData])
         .select()
         .single();
 
@@ -149,8 +155,6 @@ export const useEquipment = () => {
       
       // Refresh equipment listings
       fetchEquipment();
-      
-      return data;
     } catch (error: any) {
       toast({
         title: "Error",
