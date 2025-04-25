@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Calendar, Tag } from 'lucide-react';
 import { formatDistance } from 'date-fns';
@@ -13,6 +14,8 @@ export interface Produce {
   location: string;
   category?: string;
   image_url?: string;
+  price?: number;
+  user_id?: string;
 }
 
 interface ProduceCardProps {
