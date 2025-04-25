@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Equipment } from '@/types/equipment';  // Change import to types/equipment
+import { Equipment } from '@/types/equipment';
 import EquipmentCard from '@/components/EquipmentCard';
 
 interface EquipmentListProps {
@@ -16,6 +16,9 @@ const EquipmentList: React.FC<EquipmentListProps> = ({
   onBorrowClick,
   emptyMessage = "No equipment available matching your search criteria."
 }) => {
+  // Add console log to debug the items received
+  console.log("Equipment items to display:", items);
+  
   if (isLoading) {
     return (
       <div className="text-center py-12">

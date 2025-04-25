@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Equipment, BorrowRequest } from '@/types/equipment';
 import { useToast } from "@/components/ui/use-toast";
@@ -31,6 +32,9 @@ export const useEquipment = () => {
         .eq('available', true);
 
       if (equipmentError) throw equipmentError;
+      
+      console.log("Fetched equipment:", equipmentData);
+      
       // Convert database records to our Equipment type
       setEquipment(equipmentData?.map(item => ({
         ...item,
@@ -44,6 +48,8 @@ export const useEquipment = () => {
           .select('*')
           .eq('owner_id', user.id);
         
+        console.log("My listed items:", myListings);
+        
         // Convert to our Equipment type
         setMyListedItems(myListings?.map(item => ({
           ...item,
@@ -56,11 +62,29 @@ export const useEquipment = () => {
           .select('*, equipment_listings(*)')
           .eq('borrower_id', user.id);
 
+        console.log("My requested items:", myRequests);
+
         if (myRequests) {
           // Convert to our Equipment type
           setRequestedItems(myRequests.map(request => ({
             ...request.equipment_listings,
             status: request.equipment_listings.status as 'available' | 'borrowed' | 'requested' | 'pending',
+          })));
+        }
+        
+        // Fetch my borrowings (equipment that I'm currently borrowing)
+        const { data: borrowings } = await supabase
+          .from('borrow_requests')
+          .select('*, equipment_listings(*)')
+          .eq('borrower_id', user.id)
+          .eq('status', 'accepted');
+        
+        console.log("My borrowings:", borrowings);
+        
+        if (borrowings) {
+          setMyBorrowings(borrowings.map(borrowing => ({
+            ...borrowing.equipment_listings,
+            status: borrowing.equipment_listings.status as 'available' | 'borrowed' | 'requested' | 'pending',
           })));
         }
       }
@@ -138,6 +162,8 @@ export const useEquipment = () => {
         image_url: newItem.image_url,
         owner_id: user.id,
         owner_name: user.name || user.email || '',
+        status: 'available',
+        available: true
       };
       
       const { data, error } = await supabase

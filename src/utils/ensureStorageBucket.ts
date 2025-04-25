@@ -55,10 +55,30 @@ export const ensureEquipmentImagesBucket = async () => {
       if (createError) {
         console.error("Error creating bucket:", createError);
       } else {
-        console.log("Bucket created successfully");
+        console.log("Bucket equipment-images created successfully");
+        
+        // Update bucket to be public by default
+        const { error: updateError } = await supabase.storage.updateBucket('equipment-images', {
+          public: true,
+          fileSizeLimit: 5242880, // 5MB
+          allowedMimeTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp']
+        });
+        
+        if (updateError) {
+          console.error("Error updating bucket permissions:", updateError);
+        }
       }
     } else {
       console.log("Bucket 'equipment-images' already exists");
+      
+      // Ensure the bucket is public
+      const { error: updateError } = await supabase.storage.updateBucket('equipment-images', {
+        public: true
+      });
+      
+      if (updateError) {
+        console.error("Error updating bucket permissions:", updateError);
+      }
     }
   } catch (err) {
     console.error("Error in ensureEquipmentImagesBucket:", err);

@@ -28,6 +28,7 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment, onBorrow }) =>
             src={equipment.image_url} 
             alt={equipment.name}
             className="w-full h-full object-cover"
+            loading="lazy"
             onError={(e) => {
               console.error("Equipment image failed to load:", equipment.image_url);
               (e.target as HTMLImageElement).src = "/placeholder.svg";

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Equipment } from '@/types/equipment';  // Change import to types/equipment
+import { Equipment } from '@/types/equipment';
 import { Card, CardContent } from "@/components/ui/card";
 import { Tag } from 'lucide-react';
 
@@ -23,8 +23,23 @@ const BorrowedEquipmentList: React.FC<BorrowedEquipmentListProps> = ({ items, on
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {items.map((item) => (
         <Card key={item.id} className="overflow-hidden">
-          <div className="h-40 bg-farmlink-light flex items-center justify-center">
-            <Tag size={48} className="text-farmlink-accent opacity-20" />
+          <div className="h-40 bg-farmlink-light relative overflow-hidden">
+            {item.image_url ? (
+              <img 
+                src={item.image_url} 
+                alt={item.name} 
+                className="w-full h-full object-cover"
+                loading="lazy"
+                onError={(e) => {
+                  console.error("Equipment image failed to load:", item.image_url);
+                  (e.target as HTMLImageElement).src = "/placeholder.svg";
+                }}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Tag size={48} className="text-farmlink-accent opacity-20" />
+              </div>
+            )}
           </div>
           <CardContent className="p-4">
             <div className="flex items-center mb-2">
@@ -32,7 +47,7 @@ const BorrowedEquipmentList: React.FC<BorrowedEquipmentListProps> = ({ items, on
               <span className="text-sm text-farmlink-accent">{item.category}</span>
             </div>
             <h3 className="font-semibold text-lg mb-1">{item.name}</h3>
-            <p className="text-sm text-gray-600 mb-3">Borrowed from: {item.owner}</p>
+            <p className="text-sm text-gray-600 mb-3">Borrowed from: {item.owner_name}</p>
             
             <button 
               onClick={() => onReturn(item.id)}
