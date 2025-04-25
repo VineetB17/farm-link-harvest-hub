@@ -1,6 +1,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Produce } from '@/components/ProduceCard';
 
@@ -80,6 +80,8 @@ export const useInventory = () => {
     mutationFn: async (params: { id: string; produce: Omit<Produce, 'id'> & { image?: File } }) => {
       if (!user) throw new Error('User must be logged in');
       
+      console.log('Updating item with image URL:', params.produce.image_url);
+      
       const { data, error } = await supabase
         .from('inventory_items')
         .update({
@@ -114,4 +116,3 @@ export const useInventory = () => {
     updateItem
   };
 };
-
