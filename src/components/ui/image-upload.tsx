@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Upload, Image } from 'lucide-react';
 import { Button } from './button';
+import { supabase } from '@/lib/supabase';
 
 interface ImageUploadProps {
   value?: string;
@@ -25,10 +26,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, bucketName }
     try {
       setIsUploading(true);
       
-      // Create a FormData object
-      const formData = new FormData();
-      formData.append('file', file);
-      
       // Generate a unique filename
       const timestamp = new Date().getTime();
       const fileExtension = file.name.split('.').pop();
@@ -38,14 +35,14 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, bucketName }
       const bucket = bucketName || "equipment-images";
       
       // Upload to Supabase Storage
-      const { data, error } = await window.supabase.storage
+      const { data, error } = await supabase.storage
         .from(bucket)
         .upload(fileName, file);
         
       if (error) throw error;
       
       // Get public URL
-      const { data: urlData } = window.supabase.storage
+      const { data: urlData } = supabase.storage
         .from(bucket)
         .getPublicUrl(fileName);
         

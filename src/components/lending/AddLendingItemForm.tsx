@@ -16,39 +16,8 @@ interface AddLendingItemFormProps {
 
 const AddLendingItemForm: React.FC<AddLendingItemFormProps> = ({ onSubmit, onClose }) => {
   const { toast } = useToast();
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleImageSelect = (file: File) => {
-    setSelectedImage(file);
-    setPreviewUrl(URL.createObjectURL(file));
-  };
-
-  const uploadImage = async (file: File): Promise<string | null> => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random()}.${fileExt}`;
-    const filePath = `${fileName}`;
-
-    const { error: uploadError, data } = await supabase.storage
-      .from('equipment-images')
-      .upload(filePath, file);
-
-    if (uploadError) {
-      toast({
-        title: 'Error',
-        description: 'Failed to upload image',
-        variant: 'destructive',
-      });
-      return null;
-    }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('equipment-images')
-      .getPublicUrl(filePath);
-
-    return publicUrl;
-  };
+  const [imageUrl, setImageUrl] = useState<string>('');
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,16 +26,7 @@ const AddLendingItemForm: React.FC<AddLendingItemFormProps> = ({ onSubmit, onClo
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
     
-    try {
-      let imageUrl = null;
-      if (selectedImage) {
-        imageUrl = await uploadImage(selectedImage);
-        if (!imageUrl) {
-          setIsSubmitting(false);
-          return; // Stop if image upload failed
-        }
-      }
-      
+    try {      
       const newItem = {
         name: formData.get('name') as string,
         category: formData.get('category') as string,
@@ -79,8 +39,7 @@ const AddLendingItemForm: React.FC<AddLendingItemFormProps> = ({ onSubmit, onClo
       
       await onSubmit(newItem);
       form.reset();
-      setSelectedImage(null);
-      setPreviewUrl('');
+      setImageUrl('');
       onClose();
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -101,10 +60,14 @@ const AddLendingItemForm: React.FC<AddLendingItemFormProps> = ({ onSubmit, onClo
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <ImageUpload 
-            onImageSelect={handleImageSelect}
-            previewUrl={previewUrl}
-          />
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">Equipment Image</label>
+            <ImageUpload
+              value={imageUrl}
+              onChange={setImageUrl}
+              bucketName="equipment-images"
+            />
+          </div>
           
           <div>
             <label className="block text-sm font-medium mb-1">Equipment Name</label>
