@@ -24,7 +24,10 @@ export function useNotifications() {
     queryKey: ['notifications'],
     queryFn: async () => {
       // Using a raw query with RPC call to work around TypeScript issues
-      const { data, error } = await supabase.rpc('get_notifications');
+      const { data, error } = await supabase.rpc('get_notifications', {}) as {
+        data: Notification[] | null;
+        error: Error | null;
+      };
 
       if (error) {
         toast({
@@ -44,7 +47,10 @@ export function useNotifications() {
       // Using a raw query with RPC call to work around TypeScript issues
       const { error } = await supabase.rpc('mark_notification_read', {
         notification_id: notificationId
-      });
+      }) as {
+        data: null;
+        error: Error | null;
+      };
 
       if (error) {
         toast({
