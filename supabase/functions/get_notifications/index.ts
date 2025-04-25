@@ -27,6 +27,8 @@ Deno.serve(async (req) => {
   try {
     // Get the authorization header from the request
     const authHeader = req.headers.get('Authorization');
+    console.log("Auth header present:", !!authHeader);
+    
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'No authorization header' }), {
         status: 401,
@@ -46,12 +48,16 @@ Deno.serve(async (req) => {
       data: { user },
     } = await supabaseClient.auth.getUser();
     
+    console.log("User authenticated:", !!user);
+    
     if (!user) {
       return new Response(JSON.stringify({ error: 'Not authenticated' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    
+    console.log("Calling get_notifications RPC for user:", user.id);
     
     // Call the get_notifications RPC function
     const { data, error } = await supabaseClient.rpc('get_notifications');
@@ -64,8 +70,10 @@ Deno.serve(async (req) => {
       });
     }
     
+    console.log("Notifications retrieved:", data?.length || 0);
+    
     // Return the notifications
-    return new Response(JSON.stringify(data), {
+    return new Response(JSON.stringify(data || []), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
     

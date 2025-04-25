@@ -24,44 +24,63 @@ export function useNotifications() {
     queryKey: ['notifications'],
     queryFn: async () => {
       try {
-        // Using a direct fetch to the edge function
-        const { data, error } = await supabase.functions.invoke('get_notifications');
+        console.log("Fetching notifications for user:", user?.id);
+        
+        // Add auth header explicitly to make sure it's present
+        const { data, error, status } = await supabase.functions.invoke('get_notifications', {
+          headers: {
+            Authorization: `Bearer ${supabase.auth.session()?.access_token}`
+          }
+        });
+        
+        console.log("Edge function response status:", status);
         
         if (error) {
-          throw error;
+          console.error("Edge function error:", error);
+          throw new Error(`Error from edge function: ${error.message || JSON.stringify(error)}`);
         }
         
+        console.log("Notifications data received:", data);
         return data as Notification[] || [];
       } catch (error: any) {
+        console.error('Error fetching notifications:', error);
         toast({
           title: "Error fetching notifications",
-          description: error.message,
+          description: error.message || "Unknown error occurred",
           variant: "destructive"
         });
-        console.error('Error fetching notifications:', error);
         return [];
       }
     },
-    enabled: !!user
+    enabled: !!user && !!supabase.auth.session()?.access_token
   });
 
   const markAsRead = useMutation({
     mutationFn: async (notificationId: string) => {
       try {
-        const { error } = await supabase.functions.invoke('mark_notification_read', {
-          body: { notification_id: notificationId }
+        console.log("Marking notification as read:", notificationId);
+        
+        // Add auth header explicitly to make sure it's present
+        const { error, status } = await supabase.functions.invoke('mark_notification_read', {
+          body: { notification_id: notificationId },
+          headers: {
+            Authorization: `Bearer ${supabase.auth.session()?.access_token}`
+          }
         });
         
+        console.log("Edge function response status:", status);
+        
         if (error) {
-          throw error;
+          console.error("Edge function error:", error);
+          throw new Error(`Error from edge function: ${error.message || JSON.stringify(error)}`);
         }
       } catch (error: any) {
+        console.error('Error marking notification as read:', error);
         toast({
           title: "Error marking notification as read",
-          description: error.message,
+          description: error.message || "Unknown error occurred",
           variant: "destructive"
         });
-        console.error('Error marking notification as read:', error);
         throw error;
       }
     },

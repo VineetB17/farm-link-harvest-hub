@@ -15,6 +15,8 @@ Deno.serve(async (req) => {
   try {
     // Get the authorization header from the request
     const authHeader = req.headers.get('Authorization');
+    console.log("Auth header present:", !!authHeader);
+    
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'No authorization header' }), {
         status: 401,
@@ -34,6 +36,8 @@ Deno.serve(async (req) => {
       data: { user },
     } = await supabaseClient.auth.getUser();
     
+    console.log("User authenticated:", !!user);
+    
     if (!user) {
       return new Response(JSON.stringify({ error: 'Not authenticated' }), {
         status: 401,
@@ -42,7 +46,17 @@ Deno.serve(async (req) => {
     }
     
     // Get the notification ID from the request body
-    const { notification_id } = await req.json();
+    let notification_id;
+    try {
+      const body = await req.json();
+      notification_id = body.notification_id;
+      console.log("Marking notification as read:", notification_id);
+    } catch (e) {
+      return new Response(JSON.stringify({ error: 'Invalid request body' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
     
     if (!notification_id) {
       return new Response(JSON.stringify({ error: 'Notification ID is required' }), {
