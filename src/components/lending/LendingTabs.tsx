@@ -1,12 +1,12 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Equipment, BorrowRequest } from '@/types/equipment';
 import EquipmentList from './EquipmentList';
 import BorrowedEquipmentList from './BorrowedEquipmentList';
+import EditEquipmentForm from './EditEquipmentForm';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Trash2, Check, X } from "lucide-react";
+import { Trash2, Check, X, Pencil } from "lucide-react";
 
 interface LendingTabsProps {
   equipment: Equipment[];
@@ -20,6 +20,8 @@ interface LendingTabsProps {
   onDeleteListing: (id: string) => void;
   onAcceptRequest: (requestId: string) => void;
   onDeclineRequest: (requestId: string) => void;
+  onEditEquipment: (equipment: Partial<Equipment>) => void;
+  categories: string[];
 }
 
 const LendingTabs: React.FC<LendingTabsProps> = ({
@@ -33,8 +35,12 @@ const LendingTabs: React.FC<LendingTabsProps> = ({
   onReturnEquipment,
   onDeleteListing,
   onAcceptRequest,
-  onDeclineRequest
+  onDeclineRequest,
+  onEditEquipment,
+  categories
 }) => {
+  const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null);
+
   return (
     <Tabs defaultValue="available">
       <TabsList>
@@ -69,6 +75,20 @@ const LendingTabs: React.FC<LendingTabsProps> = ({
       </TabsContent>
 
       <TabsContent value="myListings">
+        {editingEquipment && (
+          <div className="mb-6">
+            <EditEquipmentForm
+              equipment={editingEquipment}
+              onSubmit={(data) => {
+                onEditEquipment(data);
+                setEditingEquipment(null);
+              }}
+              onClose={() => setEditingEquipment(null)}
+              categories={categories}
+            />
+          </div>
+        )}
+
         {myListedItems.length > 0 ? (
           <div className="rounded-md border">
             <Table>
@@ -98,7 +118,16 @@ const LendingTabs: React.FC<LendingTabsProps> = ({
                       </span>
                     </TableCell>
                     <TableCell>{item.location}</TableCell>
-                    <TableCell>
+                    <TableCell className="space-x-2">
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => setEditingEquipment(item)}
+                        className="h-8 w-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                      >
+                        <Pencil size={16} />
+                        <span className="sr-only">Edit</span>
+                      </Button>
                       <Button 
                         variant="ghost" 
                         size="icon" 

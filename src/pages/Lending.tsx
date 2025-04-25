@@ -136,6 +136,8 @@ const Lending: React.FC = () => {
         onDeleteListing={handleDeleteListing}
         onAcceptRequest={handleAcceptRequest}
         onDeclineRequest={handleDeclineRequest}
+        onEditEquipment={handleEditEquipment}
+        categories={categories}
       />
     </div>
   );

@@ -164,6 +164,39 @@ export const useEquipment = () => {
     }
   };
 
+  const handleEditEquipment = async (updatedItem: Partial<Equipment>): Promise<void> => {
+    if (!user || !updatedItem.id) return;
+    
+    try {
+      const { error } = await supabase
+        .from('equipment_listings')
+        .update({
+          name: updatedItem.name,
+          category: updatedItem.category,
+          description: updatedItem.description,
+          location: updatedItem.location,
+          image_url: updatedItem.image_url,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', updatedItem.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Equipment Updated",
+        description: "Your equipment listing has been updated successfully"
+      });
+      
+      fetchEquipment();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update equipment",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleBorrowRequest = async (request: any, selectedEquipment: Equipment | null) => {
     if (!selectedEquipment || !user) return;
     
@@ -347,6 +380,7 @@ export const useEquipment = () => {
     requestedItems,
     myListedItems,
     handleAddEquipment,
+    handleEditEquipment,
     handleBorrowRequest,
     handleReturnEquipment,
     handleDeleteListing,
