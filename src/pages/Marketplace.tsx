@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import ProduceCard, { Produce } from '@/components/ProduceCard';
-import { Search, Filter, Trash2, Handshake } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Search, Filter } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
+import RequestsSection from '@/components/marketplace/RequestsSection';
 
 const categories = [
   "All Categories",
@@ -218,64 +219,48 @@ const Marketplace: React.FC = () => {
 
   return (
     <div className="farmlink-container py-10">
-      {offersByCurrentUser.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4">Offers Received</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {offersByCurrentUser.map(offer => (
-              <div key={offer.id} className="bg-white p-4 rounded-lg shadow-md">
-                <h3 className="text-lg font-semibold mb-2">
-                  Offer for {offer.marketplace_products.name}
-                </h3>
-                <p>Offer Amount: ₹{offer.offer_amount}</p>
-                <p>Message: {offer.message}</p>
-                <div className="flex space-x-2 mt-2">
-                  <Button 
-                    variant="default" 
-                    size="sm"
-                    onClick={() => handleAcceptOffer(offer.id, offer.product_id)}
-                  >
-                    Accept
-                  </Button>
-                  <Button 
-                    variant="destructive" 
-                    size="sm"
-                    onClick={() => handleRejectOffer(offer.id)}
-                  >
-                    Reject
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <Tabs defaultValue="marketplace" className="w-full space-y-6">
+        <TabsList>
+          <TabsTrigger value="marketplace">Marketplace</TabsTrigger>
+          <TabsTrigger value="requests">Requests ({offersByCurrentUser.length})</TabsTrigger>
+        </TabsList>
 
-      {loading ? (
-        <div className="text-center py-12">
-          <p>Loading marketplace items...</p>
-        </div>
-      ) : (
-        <>
-          {filteredItems.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredItems.map((item) => (
-                <MarketplaceCard 
-                  key={item.id} 
-                  produce={item} 
-                  isOwner={user?.id === item.user_id}
-                  onDelete={handleDelete}
-                  onMakeOffer={handleMakeOffer}
-                />
-              ))}
+        <TabsContent value="marketplace">
+          {loading ? (
+            <div className="text-center py-12">
+              <p>Loading marketplace items...</p>
             </div>
           ) : (
-            <div className="text-center py-12 border border-dashed border-gray-300 rounded-lg">
-              <p className="text-gray-500">No items found matching your search criteria.</p>
-            </div>
+            <>
+              {filteredItems.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {filteredItems.map((item) => (
+                    <MarketplaceCard 
+                      key={item.id} 
+                      produce={item} 
+                      isOwner={user?.id === item.user_id}
+                      onDelete={handleDelete}
+                      onMakeOffer={handleMakeOffer}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 border border-dashed border-gray-300 rounded-lg">
+                  <p className="text-gray-500">No items found matching your search criteria.</p>
+                </div>
+              )}
+            </>
           )}
-        </>
-      )}
+        </TabsContent>
+
+        <TabsContent value="requests">
+          <RequestsSection
+            requests={offersByCurrentUser}
+            onAccept={handleAcceptOffer}
+            onReject={handleRejectOffer}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
