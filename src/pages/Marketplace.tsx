@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import ProduceCard, { Produce } from '@/components/ProduceCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, Trash2, Handshake } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import RequestsSection from '@/components/marketplace/RequestsSection';
+import { Button } from '@/components/ui/button';
 
 const categories = [
   "All Categories",
