@@ -4,6 +4,7 @@ import { Menu, X, User, LogOut, Settings, CloudRain, Home, ShoppingCart, Package
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/AuthContext';
+import { NotificationsDropdown } from '@/components/NotificationsDropdown';
 
 const Navbar: React.FC = () => {
   const { isLoggedIn, logout } = useAuth();
@@ -107,6 +108,7 @@ const Navbar: React.FC = () => {
               <div className="flex items-center space-x-4">
                 {isLoggedIn ? (
                   <div className="flex items-center space-x-4">
+                    <NotificationsDropdown />
                     <Link to="/profile">
                       <Button variant="ghost" className="flex items-center text-gray-700">
                         <User size={18} className="mr-2" />
