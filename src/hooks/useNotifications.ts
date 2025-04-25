@@ -23,9 +23,9 @@ export function useNotifications() {
   const { data: notifications = [], isLoading } = useQuery({
     queryKey: ['notifications'],
     queryFn: async () => {
-      // Using a raw query with RPC call to work around TypeScript issues
-      const { data, error } = await supabase.rpc('get_notifications', {}) as {
-        data: Notification[] | null;
+      // Using a more type-safe approach with the Supabase client
+      const { data, error } = await supabase.functions.invoke('get_notifications') as {
+        data: Notification[];
         error: Error | null;
       };
 
@@ -37,16 +37,16 @@ export function useNotifications() {
         });
         throw error;
       }
-      return (data || []) as Notification[];
+      return data || [];
     },
     enabled: !!user
   });
 
   const markAsRead = useMutation({
     mutationFn: async (notificationId: string) => {
-      // Using a raw query with RPC call to work around TypeScript issues
-      const { error } = await supabase.rpc('mark_notification_read', {
-        notification_id: notificationId
+      // Using a more type-safe approach with the Supabase client
+      const { error } = await supabase.functions.invoke('mark_notification_read', {
+        body: { notification_id: notificationId }
       }) as {
         data: null;
         error: Error | null;

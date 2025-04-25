@@ -1,1 +1,36 @@
+
 project_id = "uzmbxoumjrlfssdbgfww"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage"]
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[inbucket]
+enabled = true
+port = 54324
+
+[auth]
+enabled = true
+port = 54325
+
+[storage]
+enabled = true
+port = 54326
+
+[realtime]
+enabled = true
+port = 54327
+
+[functions.get_notifications]
+verify_jwt = true
+
+[functions.mark_notification_read]
+verify_jwt = true
