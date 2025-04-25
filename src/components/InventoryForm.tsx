@@ -27,7 +27,6 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
   const [farmName, setFarmName] = useState('');
   const [location, setLocation] = useState('');
   const [category, setCategory] = useState('');
-  const [image, setImage] = useState<File | undefined>();
   const [imageUrl, setImageUrl] = useState<string>('');
   const { toast } = useToast();
 
@@ -52,7 +51,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
       farmName,
       location,
       category,
-      image
+      image_url: imageUrl
     };
 
     onAddProduce(newProduce);
@@ -64,7 +63,6 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
     setHarvestDate('');
     setExpiryDate('');
     setCategory('');
-    setImage(undefined);
     setImageUrl('');
     
     toast({
@@ -75,6 +73,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
 
   // This function will be called when ImageUpload provides a URL
   const handleImageUrlChange = (url: string) => {
+    console.log("Image URL updated in add form:", url);
     setImageUrl(url);
   };
 

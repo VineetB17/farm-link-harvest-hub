@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import ProduceCard, { Produce } from '@/components/ProduceCard';
 import InventoryForm from '@/components/InventoryForm';
@@ -36,8 +37,9 @@ const Inventory: React.FC = () => {
     ensureInventoryImagesBucket();
   }, []);
 
-  const handleAddProduce = async (produce: Omit<Produce, 'id'>) => {
+  const handleAddProduce = async (produce: Omit<Produce, 'id'> & { image?: File }) => {
     try {
+      console.log("Adding produce with image_url:", produce.image_url);
       await addItem.mutateAsync(produce);
       setShowForm(false);
       toast({

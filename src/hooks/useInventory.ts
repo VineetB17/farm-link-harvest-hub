@@ -34,8 +34,10 @@ export const useInventory = () => {
   });
 
   const addItem = useMutation({
-    mutationFn: async (produce: Omit<Produce, 'id'> & { image?: File }) => {
+    mutationFn: async (produce: Omit<Produce, 'id'> & { image?: File, image_url?: string }) => {
       if (!user) throw new Error('User must be logged in');
+      
+      console.log('Adding item with image URL:', produce.image_url);
       
       const { data, error } = await supabase
         .from('inventory_items')
@@ -77,7 +79,7 @@ export const useInventory = () => {
   });
 
   const updateItem = useMutation({
-    mutationFn: async (params: { id: string; produce: Omit<Produce, 'id'> & { image?: File } }) => {
+    mutationFn: async (params: { id: string; produce: Omit<Produce, 'id'> & { image?: File, image_url?: string } }) => {
       if (!user) throw new Error('User must be logged in');
       
       console.log('Updating item with image URL:', params.produce.image_url);
