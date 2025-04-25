@@ -33,50 +33,9 @@ export const useInventory = () => {
     enabled: !!user
   });
 
-  const uploadImage = async (file: File) => {
-    if (!file) return null;
-    
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `${fileName}`;
-
-      console.log('Uploading image:', filePath);
-      
-      // Upload the file to Supabase storage
-      const { error: uploadError, data } = await supabase.storage
-        .from('inventory-images')
-        .upload(filePath, file);
-
-      if (uploadError) {
-        console.error('Error uploading image:', uploadError);
-        throw uploadError;
-      }
-
-      console.log('Image uploaded successfully:', data);
-      
-      // Get the public URL for the uploaded file
-      const { data: { publicUrl } } = supabase.storage
-        .from('inventory-images')
-        .getPublicUrl(filePath);
-
-      console.log('Image public URL:', publicUrl);
-      
-      return publicUrl;
-    } catch (error) {
-      console.error('Error in upload process:', error);
-      throw error;
-    }
-  };
-
   const addItem = useMutation({
     mutationFn: async (produce: Omit<Produce, 'id'> & { image?: File }) => {
       if (!user) throw new Error('User must be logged in');
-      
-      let imageUrl = null;
-      if (produce.image) {
-        imageUrl = await uploadImage(produce.image);
-      }
       
       const { data, error } = await supabase
         .from('inventory_items')
@@ -90,7 +49,7 @@ export const useInventory = () => {
           farm_name: produce.farmName,
           location: produce.location,
           category: produce.category,
-          image_url: imageUrl
+          image_url: produce.image_url // Use the image URL from ImageUpload component
         })
         .select()
         .single();
@@ -121,11 +80,6 @@ export const useInventory = () => {
     mutationFn: async (params: { id: string; produce: Omit<Produce, 'id'> & { image?: File } }) => {
       if (!user) throw new Error('User must be logged in');
       
-      let imageUrl = null;
-      if (params.produce.image) {
-        imageUrl = await uploadImage(params.produce.image);
-      }
-      
       const { data, error } = await supabase
         .from('inventory_items')
         .update({
@@ -137,7 +91,7 @@ export const useInventory = () => {
           farm_name: params.produce.farmName,
           location: params.produce.location,
           category: params.produce.category,
-          ...(imageUrl && { image_url: imageUrl }),
+          image_url: params.produce.image_url, // Use the image URL from ImageUpload component
           updated_at: new Date().toISOString()
         })
         .eq('id', params.id)

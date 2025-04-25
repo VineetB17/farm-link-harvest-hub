@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -28,6 +27,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onSuccess }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [productImage, setProductImage] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string>('');
   const [isImageOptional, setIsImageOptional] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -44,8 +44,8 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onSuccess }) => {
     description: ''
   });
 
-  const handleImageSelect = (file: File) => {
-    setProductImage(file);
+  const handleImageUrlChange = (url: string) => {
+    setImageUrl(url);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -59,7 +59,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onSuccess }) => {
       return;
     }
 
-    if (!productImage && !isImageOptional) {
+    if (!imageUrl && !isImageOptional) {
       toast({
         title: "Missing Image",
         description: "Please upload a product image or check 'No image available'",
@@ -72,25 +72,6 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onSuccess }) => {
     setIsSubmitting(true);
     
     try {
-      let imageUrl = null;
-      
-      if (productImage) {
-        const fileExt = productImage.name.split('.').pop();
-        const filePath = `${user.id}/${Date.now()}.${fileExt}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('marketplace-images')
-          .upload(filePath, productImage);
-          
-        if (uploadError) throw uploadError;
-        
-        const { data: { publicUrl } } = supabase.storage
-          .from('marketplace-images')
-          .getPublicUrl(filePath);
-          
-        imageUrl = publicUrl;
-      }
-      
       const { error } = await supabase.from('marketplace_products').insert({
         user_id: user.id,
         name: formData.name,
@@ -254,7 +235,11 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onSuccess }) => {
 
       <div>
         <Label>Product Image</Label>
-        <ImageUpload onImageSelect={handleImageSelect} />
+        <ImageUpload 
+          value={imageUrl}
+          onChange={handleImageUrlChange}
+          bucketName="marketplace-images"
+        />
         
         <div className="flex items-center space-x-2 mt-2">
           <Checkbox

@@ -28,7 +28,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
   const [location, setLocation] = useState('');
   const [category, setCategory] = useState('');
   const [image, setImage] = useState<File | undefined>();
-  const [previewUrl, setPreviewUrl] = useState<string | undefined>();
+  const [imageUrl, setImageUrl] = useState<string>('');
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -65,7 +65,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
     setExpiryDate('');
     setCategory('');
     setImage(undefined);
-    setPreviewUrl(undefined);
+    setImageUrl('');
     
     toast({
       title: 'Success',
@@ -73,9 +73,9 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
     });
   };
 
-  const handleImageSelect = (file: File) => {
-    setImage(file);
-    setPreviewUrl(URL.createObjectURL(file));
+  // This function will be called when ImageUpload provides a URL
+  const handleImageUrlChange = (url: string) => {
+    setImageUrl(url);
   };
 
   return (
@@ -87,8 +87,9 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
           <div>
             <label className="block text-sm font-medium mb-1">Product Image</label>
             <ImageUpload 
-              onImageSelect={handleImageSelect}
-              previewUrl={previewUrl}
+              value={imageUrl}
+              onChange={handleImageUrlChange}
+              bucketName="inventory-images"
             />
           </div>
 

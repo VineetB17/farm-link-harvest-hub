@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -30,7 +29,7 @@ const EditInventoryForm: React.FC<EditInventoryFormProps> = ({ produce, onSave, 
   const [location, setLocation] = useState(produce.location);
   const [category, setCategory] = useState(produce.category || '');
   const [image, setImage] = useState<File | undefined>();
-  const [previewUrl, setPreviewUrl] = useState<string | undefined>(produce.image_url);
+  const [imageUrl, setImageUrl] = useState<string>(produce.image_url || '');
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -55,16 +54,14 @@ const EditInventoryForm: React.FC<EditInventoryFormProps> = ({ produce, onSave, 
       location,
       category,
       image,
-      image_url: previewUrl // Keep the existing image URL if no new image is selected
+      image_url: imageUrl // Keep the existing image URL if no new image is selected
     };
 
     onSave(updatedProduce);
   };
 
-  const handleImageSelect = (file: File) => {
-    setImage(file);
-    // Create a local preview URL
-    setPreviewUrl(URL.createObjectURL(file));
+  const handleImageUrlChange = (url: string) => {
+    setImageUrl(url);
   };
 
   return (
@@ -76,8 +73,9 @@ const EditInventoryForm: React.FC<EditInventoryFormProps> = ({ produce, onSave, 
           <div>
             <label className="block text-sm font-medium mb-1">Product Image</label>
             <ImageUpload 
-              onImageSelect={handleImageSelect}
-              previewUrl={previewUrl}
+              value={imageUrl}
+              onChange={handleImageUrlChange}
+              bucketName="inventory-images"
             />
           </div>
 
