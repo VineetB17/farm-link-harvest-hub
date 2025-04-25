@@ -30,6 +30,7 @@ const Inventory: React.FC = () => {
   const { inventory, isLoading, addItem, deleteItem, updateItem } = useInventory();
   const [selectedItem, setSelectedItem] = useState<Produce | null>(null);
   const [isAddingToMarketplace, setIsAddingToMarketplace] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   useEffect(() => {
     ensureInventoryImagesBucket();
@@ -121,16 +122,19 @@ const Inventory: React.FC = () => {
 
   const handleStartEdit = (produce: Produce) => {
     setEditingItem(produce);
+    setEditDialogOpen(true);
   };
 
   const handleCancelEdit = () => {
     setEditingItem(null);
+    setEditDialogOpen(false);
   };
 
   const handleSaveEdit = async (updatedProduce: Omit<Produce, 'id'> & { image?: File }) => {
     if (!editingItem) return;
     
     try {
+      console.log("Saving with image URL:", updatedProduce.image_url);
       await updateItem.mutateAsync({
         id: editingItem.id,
         produce: updatedProduce
@@ -142,6 +146,7 @@ const Inventory: React.FC = () => {
       });
       
       setEditingItem(null);
+      setEditDialogOpen(false);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -257,20 +262,23 @@ const Inventory: React.FC = () => {
               </div>
             )}
 
-            {editingItem && (
-              <Dialog open={!!editingItem} onOpenChange={() => setEditingItem(null)}>
-                <DialogContent className="max-w-4xl">
-                  <DialogHeader>
-                    <DialogTitle>Edit Item</DialogTitle>
-                  </DialogHeader>
+            <Dialog open={editDialogOpen} onOpenChange={(open) => {
+              if (!open) setEditingItem(null);
+              setEditDialogOpen(open);
+            }}>
+              <DialogContent className="max-w-4xl">
+                <DialogHeader>
+                  <DialogTitle>Edit Item</DialogTitle>
+                </DialogHeader>
+                {editingItem && (
                   <EditInventoryForm
                     produce={editingItem}
                     onSave={handleSaveEdit}
                     onCancel={handleCancelEdit}
                   />
-                </DialogContent>
-              </Dialog>
-            )}
+                )}
+              </DialogContent>
+            </Dialog>
           </div>
         </TabsContent>
 

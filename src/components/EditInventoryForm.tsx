@@ -59,6 +59,11 @@ const EditInventoryForm: React.FC<EditInventoryFormProps> = ({ produce, onSave, 
     onSave(updatedProduce);
   };
 
+  const handleImageChange = (url: string) => {
+    console.log("Image URL updated in form:", url);
+    setImageUrl(url);
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-xl font-semibold mb-6">Edit Item</h2>
@@ -69,7 +74,7 @@ const EditInventoryForm: React.FC<EditInventoryFormProps> = ({ produce, onSave, 
             <label className="block text-sm font-medium mb-1">Product Image</label>
             <ImageUpload 
               value={imageUrl}
-              onChange={setImageUrl}
+              onChange={handleImageChange}
               bucketName="inventory-images"
             />
           </div>
@@ -179,7 +184,7 @@ const EditInventoryForm: React.FC<EditInventoryFormProps> = ({ produce, onSave, 
         </div>
         
         <div className="flex justify-end space-x-2">
-          <Button variant="outline" onClick={onCancel}>
+          <Button variant="outline" onClick={onCancel} type="button">
             Cancel
           </Button>
           <Button type="submit" className="bg-farmlink-primary hover:bg-farmlink-secondary">
