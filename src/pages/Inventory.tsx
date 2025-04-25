@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import ProduceCard, { Produce } from '@/components/ProduceCard';
 import InventoryForm from '@/components/InventoryForm';
+import EditInventoryForm from '@/components/EditInventoryForm';
 import AddProductForm from '@/components/marketplace/AddProductForm';
 import { Plus, Minus, Filter, Trash2, ShoppingCart } from 'lucide-react';
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useInventory } from '@/hooks/useInventory';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -24,7 +25,8 @@ const Inventory: React.FC = () => {
   const { toast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
-  const { inventory, isLoading, addItem, deleteItem } = useInventory();
+  const [editingItem, setEditingItem] = useState<Produce | null>(null);
+  const { inventory, isLoading, addItem, deleteItem, updateItem } = useInventory();
   const [selectedItem, setSelectedItem] = useState<Produce | null>(null);
   const [isAddingToMarketplace, setIsAddingToMarketplace] = useState(false);
 
@@ -112,6 +114,38 @@ const Inventory: React.FC = () => {
     }
   };
 
+  const handleStartEdit = (produce: Produce) => {
+    setEditingItem(produce);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingItem(null);
+  };
+
+  const handleSaveEdit = async (updatedProduce: Omit<Produce, 'id'> & { image?: File }) => {
+    if (!editingItem) return;
+    
+    try {
+      await updateItem.mutateAsync({
+        id: editingItem.id,
+        produce: updatedProduce
+      });
+      
+      toast({
+        title: "Success",
+        description: "Item updated successfully",
+      });
+      
+      setEditingItem(null);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update item",
+        variant: "destructive",
+      });
+    }
+  };
+
   const filteredInventory = inventory.filter(item => 
     selectedCategory === 'All Categories' || item.category === selectedCategory
   );
@@ -177,7 +211,11 @@ const Inventory: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredInventory.map((produce) => (
                 <div key={produce.id} className="relative group">
-                  <ProduceCard produce={produce} />
+                  <ProduceCard 
+                    produce={produce}
+                    showEditButton={true}
+                    onEdit={() => handleStartEdit(produce)}
+                  />
                   <div className="absolute top-2 right-2 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={() => {
@@ -212,6 +250,21 @@ const Inventory: React.FC = () => {
                   Add New Produce
                 </button>
               </div>
+            )}
+
+            {editingItem && (
+              <Dialog open={!!editingItem} onOpenChange={() => setEditingItem(null)}>
+                <DialogContent className="max-w-4xl">
+                  <DialogHeader>
+                    <DialogTitle>Edit Item</DialogTitle>
+                  </DialogHeader>
+                  <EditInventoryForm
+                    produce={editingItem}
+                    onSave={handleSaveEdit}
+                    onCancel={handleCancelEdit}
+                  />
+                </DialogContent>
+              </Dialog>
             )}
           </div>
         </TabsContent>

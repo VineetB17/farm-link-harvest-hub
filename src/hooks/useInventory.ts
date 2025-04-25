@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Produce } from '@/components/ProduceCard';
 
@@ -97,10 +97,46 @@ export const useInventory = () => {
     }
   });
 
+  const updateItem = useMutation({
+    mutationFn: async (params: { id: string; produce: Omit<Produce, 'id'> & { image?: File } }) => {
+      if (!user) throw new Error('User must be logged in');
+      
+      let imageUrl = null;
+      if (params.produce.image) {
+        imageUrl = await uploadImage(params.produce.image);
+      }
+      
+      const { data, error } = await supabase
+        .from('inventory_items')
+        .update({
+          name: params.produce.name,
+          quantity: params.produce.quantity,
+          unit: params.produce.unit,
+          harvest_date: params.produce.harvestDate.toISOString(),
+          expiry_date: params.produce.expiryDate.toISOString(),
+          farm_name: params.produce.farmName,
+          location: params.produce.location,
+          category: params.produce.category,
+          ...(imageUrl && { image_url: imageUrl }),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', params.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['inventory'] });
+    }
+  });
+
   return {
     inventory,
     isLoading,
     addItem,
-    deleteItem
+    deleteItem,
+    updateItem
   };
 };

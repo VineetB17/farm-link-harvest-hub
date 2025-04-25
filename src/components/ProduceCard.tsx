@@ -1,7 +1,7 @@
-
 import React from 'react';
-import { Calendar, Tag } from 'lucide-react';
+import { Calendar, Tag, Edit } from 'lucide-react';
 import { formatDistance } from 'date-fns';
+import { Button } from '@/components/ui/button';
 
 export interface Produce {
   id: string;
@@ -20,9 +20,11 @@ export interface Produce {
 
 interface ProduceCardProps {
   produce: Produce;
+  onEdit?: () => void;
+  showEditButton?: boolean;
 }
 
-const ProduceCard: React.FC<ProduceCardProps> = ({ produce }) => {
+const ProduceCard: React.FC<ProduceCardProps> = ({ produce, onEdit, showEditButton = false }) => {
   const now = new Date();
   const daysLeft = formatDistance(produce.expiryDate, now, { addSuffix: true });
   const isExpiringSoon = new Date(produce.expiryDate).getTime() - now.getTime() < 3 * 24 * 60 * 60 * 1000;
@@ -65,11 +67,24 @@ const ProduceCard: React.FC<ProduceCardProps> = ({ produce }) => {
       
       <p className="text-sm text-gray-600 mb-3">{produce.location}</p>
       
-      <div className="flex items-center text-sm mt-auto pt-2 border-t border-gray-100">
-        <Calendar size={16} className="mr-1 text-farmlink-accent" />
-        <span className={isExpiringSoon ? "text-red-500" : "text-gray-600"}>
-          Expiry: {daysLeft}
-        </span>
+      <div className="flex items-center justify-between text-sm mt-auto pt-2 border-t border-gray-100">
+        <div className="flex items-center">
+          <Calendar size={16} className="mr-1 text-farmlink-accent" />
+          <span className={isExpiringSoon ? "text-red-500" : "text-gray-600"}>
+            Expiry: {daysLeft}
+          </span>
+        </div>
+        {showEditButton && onEdit && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onEdit}
+            className="text-farmlink-primary hover:text-farmlink-secondary"
+          >
+            <Edit size={16} className="mr-1" />
+            Edit
+          </Button>
+        )}
       </div>
     </div>
   );
