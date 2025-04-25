@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
   const [location, setLocation] = useState('');
   const [category, setCategory] = useState('');
   const [image, setImage] = useState<File | undefined>();
+  const [previewUrl, setPreviewUrl] = useState<string | undefined>();
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -63,11 +65,17 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
     setExpiryDate('');
     setCategory('');
     setImage(undefined);
+    setPreviewUrl(undefined);
     
     toast({
       title: 'Success',
       description: 'Produce added to inventory',
     });
+  };
+
+  const handleImageSelect = (file: File) => {
+    setImage(file);
+    setPreviewUrl(URL.createObjectURL(file));
   };
 
   return (
@@ -79,8 +87,8 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onAddProduce }) => {
           <div>
             <label className="block text-sm font-medium mb-1">Product Image</label>
             <ImageUpload 
-              onImageSelect={(file) => setImage(file)}
-              previewUrl={image ? URL.createObjectURL(image) : undefined}
+              onImageSelect={handleImageSelect}
+              previewUrl={previewUrl}
             />
           </div>
 

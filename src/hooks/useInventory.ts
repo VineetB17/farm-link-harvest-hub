@@ -26,28 +26,47 @@ export const useInventory = () => {
         expiryDate: new Date(item.expiry_date),
         farmName: item.farm_name,
         location: item.location,
-        category: item.category
+        category: item.category,
+        image_url: item.image_url
       }));
     },
     enabled: !!user
   });
 
   const uploadImage = async (file: File) => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random()}.${fileExt}`;
-    const filePath = `${fileName}`;
+    if (!file) return null;
+    
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
 
-    const { error: uploadError, data } = await supabase.storage
-      .from('inventory-images')
-      .upload(filePath, file);
+      console.log('Uploading image:', filePath);
+      
+      // Upload the file to Supabase storage
+      const { error: uploadError, data } = await supabase.storage
+        .from('inventory-images')
+        .upload(filePath, file);
 
-    if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Error uploading image:', uploadError);
+        throw uploadError;
+      }
 
-    const { data: { publicUrl } } = supabase.storage
-      .from('inventory-images')
-      .getPublicUrl(filePath);
+      console.log('Image uploaded successfully:', data);
+      
+      // Get the public URL for the uploaded file
+      const { data: { publicUrl } } = supabase.storage
+        .from('inventory-images')
+        .getPublicUrl(filePath);
 
-    return publicUrl;
+      console.log('Image public URL:', publicUrl);
+      
+      return publicUrl;
+    } catch (error) {
+      console.error('Error in upload process:', error);
+      throw error;
+    }
   };
 
   const addItem = useMutation({

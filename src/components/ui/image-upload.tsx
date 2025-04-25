@@ -36,8 +36,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelect, previewUrl }) 
         <div className="relative w-full aspect-video">
           <img
             src={previewUrl}
-            alt="Equipment preview"
+            alt="Preview image"
             className="w-full h-full object-cover rounded-lg"
+            onError={(e) => {
+              console.error("Preview image failed to load:", previewUrl);
+              (e.target as HTMLImageElement).src = "/placeholder.svg";
+            }}
           />
           <Button
             onClick={handleClick}
@@ -54,7 +58,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelect, previewUrl }) 
           className="w-full aspect-video flex flex-col items-center justify-center gap-2 border-dashed"
         >
           <Upload className="h-8 w-8" />
-          <span>Upload Equipment Image</span>
+          <span>Upload Image</span>
         </Button>
       )}
     </div>

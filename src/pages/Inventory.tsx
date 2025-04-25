@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProduceCard, { Produce } from '@/components/ProduceCard';
 import InventoryForm from '@/components/InventoryForm';
 import EditInventoryForm from '@/components/EditInventoryForm';
@@ -11,6 +10,7 @@ import { useInventory } from '@/hooks/useInventory';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { supabase } from '@/lib/supabase';
+import { ensureInventoryImagesBucket } from '@/utils/ensureStorageBucket';
 
 const categories = [
   "All Categories",
@@ -30,6 +30,10 @@ const Inventory: React.FC = () => {
   const { inventory, isLoading, addItem, deleteItem, updateItem } = useInventory();
   const [selectedItem, setSelectedItem] = useState<Produce | null>(null);
   const [isAddingToMarketplace, setIsAddingToMarketplace] = useState(false);
+
+  useEffect(() => {
+    ensureInventoryImagesBucket();
+  }, []);
 
   const handleAddProduce = async (produce: Omit<Produce, 'id'>) => {
     try {

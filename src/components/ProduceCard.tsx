@@ -38,6 +38,10 @@ const ProduceCard: React.FC<ProduceCardProps> = ({ produce, onEdit, showEditButt
             src={produce.image_url} 
             alt={produce.name}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              console.error("Image failed to load:", produce.image_url);
+              (e.target as HTMLImageElement).src = "/placeholder.svg";
+            }}
           />
         </div>
       )}

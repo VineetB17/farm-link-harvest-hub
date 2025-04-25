@@ -30,6 +30,7 @@ const EditInventoryForm: React.FC<EditInventoryFormProps> = ({ produce, onSave, 
   const [location, setLocation] = useState(produce.location);
   const [category, setCategory] = useState(produce.category || '');
   const [image, setImage] = useState<File | undefined>();
+  const [previewUrl, setPreviewUrl] = useState<string | undefined>(produce.image_url);
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -53,10 +54,17 @@ const EditInventoryForm: React.FC<EditInventoryFormProps> = ({ produce, onSave, 
       farmName,
       location,
       category,
-      image
+      image,
+      image_url: previewUrl // Keep the existing image URL if no new image is selected
     };
 
     onSave(updatedProduce);
+  };
+
+  const handleImageSelect = (file: File) => {
+    setImage(file);
+    // Create a local preview URL
+    setPreviewUrl(URL.createObjectURL(file));
   };
 
   return (
@@ -68,8 +76,8 @@ const EditInventoryForm: React.FC<EditInventoryFormProps> = ({ produce, onSave, 
           <div>
             <label className="block text-sm font-medium mb-1">Product Image</label>
             <ImageUpload 
-              onImageSelect={(file) => setImage(file)}
-              previewUrl={produce.image_url}
+              onImageSelect={handleImageSelect}
+              previewUrl={previewUrl}
             />
           </div>
 
