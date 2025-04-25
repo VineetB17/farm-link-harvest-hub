@@ -23,41 +23,45 @@ export function useNotifications() {
   const { data: notifications = [], isLoading } = useQuery({
     queryKey: ['notifications'],
     queryFn: async () => {
-      // Using a more type-safe approach with the Supabase client
-      const { data, error } = await supabase.functions.invoke('get_notifications') as {
-        data: Notification[];
-        error: Error | null;
-      };
-
-      if (error) {
+      try {
+        // Using a direct fetch to the edge function
+        const { data, error } = await supabase.functions.invoke('get_notifications');
+        
+        if (error) {
+          throw error;
+        }
+        
+        return data as Notification[] || [];
+      } catch (error: any) {
         toast({
           title: "Error fetching notifications",
           description: error.message,
           variant: "destructive"
         });
-        throw error;
+        console.error('Error fetching notifications:', error);
+        return [];
       }
-      return data || [];
     },
     enabled: !!user
   });
 
   const markAsRead = useMutation({
     mutationFn: async (notificationId: string) => {
-      // Using a more type-safe approach with the Supabase client
-      const { error } = await supabase.functions.invoke('mark_notification_read', {
-        body: { notification_id: notificationId }
-      }) as {
-        data: null;
-        error: Error | null;
-      };
-
-      if (error) {
+      try {
+        const { error } = await supabase.functions.invoke('mark_notification_read', {
+          body: { notification_id: notificationId }
+        });
+        
+        if (error) {
+          throw error;
+        }
+      } catch (error: any) {
         toast({
           title: "Error marking notification as read",
           description: error.message,
           variant: "destructive"
         });
+        console.error('Error marking notification as read:', error);
         throw error;
       }
     },
