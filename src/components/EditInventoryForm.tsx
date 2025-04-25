@@ -28,7 +28,6 @@ const EditInventoryForm: React.FC<EditInventoryFormProps> = ({ produce, onSave, 
   const [farmName, setFarmName] = useState(produce.farmName);
   const [location, setLocation] = useState(produce.location);
   const [category, setCategory] = useState(produce.category || '');
-  const [image, setImage] = useState<File | undefined>();
   const [imageUrl, setImageUrl] = useState<string>(produce.image_url || '');
   const { toast } = useToast();
 
@@ -53,15 +52,10 @@ const EditInventoryForm: React.FC<EditInventoryFormProps> = ({ produce, onSave, 
       farmName,
       location,
       category,
-      image,
-      image_url: imageUrl // Keep the existing image URL if no new image is selected
+      image_url: imageUrl
     };
 
     onSave(updatedProduce);
-  };
-
-  const handleImageUrlChange = (url: string) => {
-    setImageUrl(url);
   };
 
   return (
@@ -74,7 +68,7 @@ const EditInventoryForm: React.FC<EditInventoryFormProps> = ({ produce, onSave, 
             <label className="block text-sm font-medium mb-1">Product Image</label>
             <ImageUpload 
               value={imageUrl}
-              onChange={handleImageUrlChange}
+              onChange={setImageUrl}
               bucketName="inventory-images"
             />
           </div>

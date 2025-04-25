@@ -91,7 +91,7 @@ export const useInventory = () => {
           farm_name: params.produce.farmName,
           location: params.produce.location,
           category: params.produce.category,
-          image_url: params.produce.image_url, // Use the image URL from ImageUpload component
+          image_url: params.produce.image_url,
           updated_at: new Date().toISOString()
         })
         .eq('id', params.id)
@@ -114,3 +114,4 @@ export const useInventory = () => {
     updateItem
   };
 };
+
